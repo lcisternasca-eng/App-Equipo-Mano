@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tabla Quirúrgica — Unidad de Mano</title>
+<style>
+  :root {
+    --bg:#f5f5f3;--surface:#fff;--border:#e2e2de;--border-mid:#c8c8c2;
+    --text:#1a1a18;--text-2:#6b6b66;--text-3:#9b9b94;
+    --blue:#185FA5;--blue-l:#E6F1FB;--blue-d:#0C447C;
+    --green:#3B6D11;--green-l:#EAF3DE;
+    --amber-l:#FAEEDA;--amber-d:#633806;
+    --red-l:#FCEBEB;--red-d:#791F1F;
+    --r:8px;--rl:12px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:14px}
+  /* AUTH */
+  #auth-screen{display:flex;align-items:center;justify-content:center;min-height:100vh}
+  .auth-card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--rl);padding:40px 48px;text-align:center;max-width:380px;width:100%}
+  .auth-card h1{font-size:20px;font-weight:500;margin-bottom:6px}
+  .auth-card p{font-size:13px;color:var(--text-2);margin-bottom:28px;line-height:1.5}
+  .btn-google{display:inline-flex;align-items:center;gap:10px;padding:10px 20px;border:0.5px solid var(--border-mid);border-radius:var(--r);background:var(--surface);color:var(--text);font-size:14px;cursor:pointer;width:100%;justify-content:center}
+  .btn-google:hover{background:var(--bg)}
+  /* LAYOUT */
+  #app{display:none;height:100vh;overflow:hidden}
+  .layout{display:flex;height:100vh}
+  .sidebar{width:214px;min-width:214px;background:var(--surface);border-right:0.5px solid var(--border);display:flex;flex-direction:column}
+  .sidebar-logo{padding:18px 14px 14px;border-bottom:0.5px solid var(--border)}
+  .sidebar-logo .t{font-size:14px;font-weight:500;display:flex;align-items:center;gap:7px}
+  .sidebar-logo .s{font-size:11px;color:var(--text-2);margin-top:3px;padding-left:22px}
+  .nav-section{font-size:10px;color:var(--text-3);font-weight:500;letter-spacing:.6px;padding:12px 10px 4px;text-transform:uppercase}
+  .nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--r);cursor:pointer;font-size:13px;color:var(--text-2);margin:1px 6px}
+  .nav-item:hover{background:var(--bg);color:var(--text)}
+  .nav-item.active{background:var(--blue-l);color:var(--blue-d);font-weight:500}
+  .main{flex:1;overflow-y:auto;display:flex;flex-direction:column;min-width:0}
+  .topbar{background:var(--surface);border-bottom:0.5px solid var(--border);padding:12px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0;position:sticky;top:0;z-index:10}
+  .topbar-title{font-size:15px;font-weight:500}
+  .content{padding:18px 22px;flex:1}
+  /* BUTTONS */
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:var(--r);border:0.5px solid var(--border-mid);background:transparent;color:var(--text);font-size:12px;cursor:pointer;white-space:nowrap}
+  .btn:hover{background:var(--bg)}
+  .btn-p{background:var(--blue);border-color:var(--blue);color:#fff}
+  .btn-p:hover{background:var(--blue-d)}
+  .btn-s{background:var(--green);border-color:var(--green);color:#fff}
+  .btn-s:hover{background:#27500A}
+  .bti{background:transparent;border:none;color:var(--text-2);cursor:pointer;padding:4px 5px;border-radius:5px;display:inline-flex;align-items:center}
+  .bti:hover{background:var(--bg);color:var(--text)}
+  .bti.d:hover{color:var(--red-d);background:var(--red-l)}
+  /* BADGES */
+  .badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500}
+  .bw{background:var(--amber-l);color:var(--amber-d)}
+  .br{background:var(--green-l);color:#27500A}
+  .bs{background:var(--blue-l);color:var(--blue-d)}
+  .bu{background:var(--red-l);color:var(--red-d)}
+  .dtag{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500}
+  .dok{background:var(--green-l);color:#27500A}
+  .dwarn{background:var(--amber-l);color:var(--amber-d)}
+  .durg{background:var(--red-l);color:var(--red-d)}
+  /* STATS */
+  .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+  .stat-card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r);padding:13px 14px}
+  .stat-label{font-size:11px;color:var(--text-2);margin-bottom:5px}
+  .stat-val{font-size:22px;font-weight:500}
+  /* CARD / TABLE */
+  .card{background:var(--surface);border-radius:var(--rl);border:0.5px solid var(--border);overflow:hidden;margin-bottom:14px}
+  .card-head{padding:11px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid var(--border);background:var(--bg)}
+  .cht{font-size:13px;font-weight:500}
+  .tw{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:12px;min-width:700px}
+  th{padding:8px 12px;text-align:left;color:var(--text-2);font-weight:500;border-bottom:0.5px solid var(--border);font-size:11px;white-space:nowrap;background:var(--bg)}
+  td{padding:9px 12px;border-bottom:0.5px solid var(--border);vertical-align:middle}
+  tr:last-child td{border-bottom:none}
+  tr:hover td{background:var(--bg)}
+  /* RX */
+  .xray{width:28px;height:28px;border-radius:4px;background:#2c2c2a;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+  .xray svg{opacity:.4}
+  .xray.has{background:var(--blue-d)}
+  .xray.has svg{opacity:1}
+  /* PABELLON */
+  .pab-block{background:var(--surface);border-radius:var(--rl);border:0.5px solid var(--border);margin-bottom:14px;overflow:hidden}
+  .pab-hdr{padding:10px 16px;background:var(--bg);border-bottom:0.5px solid var(--border);display:flex;align-items:center;gap:10px}
+  .pab-input{font-size:13px;font-weight:500;border:none;background:transparent;color:var(--text);outline:none;border-bottom:1.5px solid transparent;padding:1px 2px;flex:1;min-width:0}
+  .pab-input:focus{border-bottom-color:var(--blue)}
+  .pill{display:inline-block;background:var(--bg);border:0.5px solid var(--border-mid);border-radius:20px;padding:2px 9px;font-size:11px;font-weight:500;color:var(--text-2)}
+  /* SYNC */
+  .sbar{background:var(--green-l);border:0.5px solid #c0dd97;border-radius:var(--r);padding:9px 14px;display:flex;align-items:center;gap:9px;font-size:12px;color:#27500A;margin-bottom:14px}
+  .sbar.err{background:var(--red-l);border-color:#f09595;color:var(--red-d)}
+  .sbar.load{background:var(--amber-l);border-color:#FAC775;color:var(--amber-d)}
+  .dot{width:7px;height:7px;border-radius:50%;background:#639922;display:inline-block;flex-shrink:0}
+  .dot.r{background:#E24B4A} .dot.a{background:#EF9F27}
+  /* MODAL */
+  .mbg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:200;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto}
+  .mbg.open{display:flex}
+  .modal{background:var(--surface);border-radius:var(--rl);border:0.5px solid var(--border);width:560px;max-width:100%;margin-bottom:40px}
+  .mhd{padding:15px 18px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+  .mhd h2{font-size:15px;font-weight:500}
+  .mbd{padding:18px}
+  .mft{padding:12px 18px;border-top:0.5px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
+  .fg{display:flex;flex-direction:column;gap:4px;margin-bottom:11px}
+  .fg label{font-size:11px;color:var(--text-2);font-weight:500}
+  .fg input,.fg select,.fg textarea{font-size:13px;padding:7px 10px;border-radius:var(--r);border:0.5px solid var(--border-mid);background:var(--surface);color:var(--text);width:100%}
+  .fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:var(--blue)}
+  .fg textarea{resize:vertical;min-height:60px}
+  .fg2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .ssep{font-size:10px;font-weight:500;color:var(--text-2);text-transform:uppercase;letter-spacing:.5px;border-top:0.5px solid var(--border);padding-top:12px;margin:12px 0 10px}
+  .uz{border:1.5px dashed var(--border-mid);border-radius:var(--r);padding:16px;text-align:center;cursor:pointer}
+  .uz:hover{background:var(--bg)}
+  .uz svg{opacity:.4}
+  .uz p{font-size:12px;color:var(--text-2);margin-top:5px}
+  .prev-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+  .prev-row img{width:56px;height:56px;object-fit:cover;border-radius:6px;border:0.5px solid var(--border);cursor:pointer}
+  /* CHIPS */
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .chip{background:var(--bg);border-radius:var(--r);padding:7px 11px;font-size:12px;border:0.5px solid var(--border)}
+  .chip strong{display:block;font-size:10px;color:var(--text-2);font-weight:500;margin-bottom:2px}
+  /* CAL */
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+  .cal-dn{text-align:center;font-size:10px;color:var(--text-2);font-weight:500;padding:4px}
+  .cal-cell{background:var(--surface);border:0.5px solid var(--border);border-radius:6px;padding:5px;min-height:54px;font-size:11px}
+  .cal-cell.today{border-color:var(--blue)}
+  .cal-cell.empty{background:transparent;border-color:transparent}
+  .cal-num{font-weight:500;color:var(--text-2);margin-bottom:2px}
+  .cal-cell.today .cal-num{color:var(--blue)}
+  .cal-ev{border-radius:3px;padding:1px 4px;margin-top:2px;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  /* LOADER */
+  .spin{display:inline-block;width:14px;height:14px;border:2px solid var(--border-mid);border-top-color:var(--blue);border-radius:50%;animation:sp .7s linear infinite}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  .empty-s{text-align:center;padding:36px 20px;color:var(--text-2);font-size:13px}
+  /* CONFIG */
+  .cfg-sec{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--rl);margin-bottom:14px;overflow:hidden}
+  .cfg-hd{padding:11px 16px;border-bottom:0.5px solid var(--border);font-size:13px;font-weight:500;background:var(--bg)}
+  .cfg-bd{padding:16px}
+  /* VIEWER */
+  #viewer{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:300;align-items:center;justify-content:center}
+  #viewer.open{display:flex}
+  #viewer img{max-width:90vw;max-height:90vh;border-radius:8px}
+  #viewer .vc{position:fixed;top:20px;right:24px;background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:50%;width:36px;height:36px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  /* TOAST */
+  #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a18;color:#fff;padding:10px 18px;border-radius:var(--r);font-size:13px;z-index:400;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+  #toast.show{opacity:1}
+  /* USER */
+  .sidebar-user{padding:10px;border-top:0.5px solid var(--border);margin-top:auto}
+  .uchip{display:flex;align-items:center;gap:8px;padding:7px 8px;background:var(--bg);border-radius:var(--r);cursor:pointer}
+  .uchip:hover{background:var(--border)}
+  .avatar{width:28px;height:28px;border-radius:50%;background:var(--blue-l);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:var(--blue-d);flex-shrink:0;overflow:hidden}
+  .avatar img{width:100%;height:100%;object-fit:cover}
+  .uname{font-size:12px;font-weight:500}
+  .urole{font-size:10px;color:var(--text-2)}
+  @media(max-width:768px){.sidebar{display:none}.stats-row{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+
+<div id="auth-screen">
+  <div class="auth-card">
+    <div style="margin-bottom:18px">
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none" style="margin:0 auto;display:block">
+        <rect width="40" height="40" rx="10" fill="#E6F1FB"/>
+        <path d="M10 28l4-8 4 5 4-10 4 11" stroke="#185FA5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h1>Tabla Quirúrgica</h1>
+    <p>Unidad de Mano<br>Accede con tu cuenta Google del equipo</p>
+    <button class="btn-google" onclick="signIn()">
+      <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 002.38-5.88c0-.57-.05-.66-.15-1.18z"/><path fill="#34A853" d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2.04a4.8 4.8 0 01-7.18-2.54H1.83v2.07A8 8 0 008.98 17z"/><path fill="#FBBC05" d="M4.5 10.48A4.8 4.8 0 014.5 7.5V5.43H1.83a8 8 0 000 7.14L4.5 10.48z"/><path fill="#EA4335" d="M8.98 3.58c1.32 0 2.5.45 3.44 1.35l2.54-2.54A8 8 0 001.83 5.43L4.5 7.5a4.8 4.8 0 014.48-3.92z"/></svg>
+      Continuar con Google
+    </button>
+    <p style="font-size:11px;color:var(--text-3);margin-top:16px;margin-bottom:0">Solo cuentas autorizadas del equipo</p>
+  </div>
+</div>
+
+<div id="app">
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="t">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#185FA5" stroke-width="2" stroke-linecap="round"><path d="M2 12l3-6 3 4 3-7 3 9"/></svg>
+          Tabla Quirúrgica
+        </div>
+        <div class="s">Unidad de Mano</div>
+      </div>
+      <nav style="padding:10px 6px;flex:1">
+        <div class="nav-section">Urgencia</div>
+        <div class="nav-item active" data-view="lista" onclick="navTo(this)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Lista de espera
+        </div>
+        <div class="nav-section">Pabellón</div>
+        <div class="nav-item" data-view="pabellon" onclick="navTo(this)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+          Tabla quirúrgica
+        </div>
+        <div class="nav-item" data-view="calendario" onclick="navTo(this)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Calendario
+        </div>
+        <div class="nav-section">Sistema</div>
+        <div class="nav-item" data-view="config" onclick="navTo(this)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+          Configuración
+        </div>
+      </nav>
+      <div class="sidebar-user">
+        <div class="uchip" onclick="signOut()">
+          <div class="avatar" id="user-avatar"><span id="user-initials">?</span></div>
+          <div><div class="uname" id="user-name">Cargando...</div><div class="urole">Cerrar sesión</div></div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="main">
+      <div class="topbar">
+        <span class="topbar-title" id="view-title">Lista de espera</span>
+        <div style="display:flex;gap:7px" id="topbar-actions">
+          <button class="btn" onclick="openM('modal-buscar')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            Buscar por RUT
+          </button>
+          <button class="btn btn-p" onclick="openM('modal-ne')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Registrar desde urgencia
+          </button>
+        </div>
+      </div>
+      <div class="content">
+
+        <!-- LISTA DE ESPERA -->
+        <div id="view-lista" class="vp">
+          <div id="sb-lista" class="sbar load"><span class="dot a"></span><span>Cargando datos...</span><span class="spin" style="margin-left:auto"></span></div>
+          <div class="stats-row">
+            <div class="stat-card"><div class="stat-label">En espera</div><div class="stat-val" id="s-total">—</div></div>
+            <div class="stat-card"><div class="stat-label">Listos para agendar</div><div class="stat-val" style="color:var(--green)" id="s-listos">—</div></div>
+            <div class="stat-card"><div class="stat-label">Promedio días</div><div class="stat-val" style="color:var(--amber-d)" id="s-prom">—</div></div>
+            <div class="stat-card"><div class="stat-label">&gt;30 días</div><div class="stat-val" style="color:var(--red-d)" id="s-urg">—</div></div>
+          </div>
+          <div class="card">
+            <div class="card-head">
+              <span class="cht">Pacientes en lista</span>
+              <div style="display:flex;gap:7px;align-items:center">
+                <select id="fil-lista" onchange="renderLista()" style="font-size:12px;padding:5px 8px;border-radius:var(--r);border:0.5px solid var(--border-mid);background:var(--surface);color:var(--text)">
+                  <option value="all">Todos</option>
+                  <option value="ready">Listos (&gt;14 días)</option>
+                  <option value="urgent">Urgentes (&gt;30 días)</option>
+                </select>
+                <button class="btn" onclick="loadLista()">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+                  Actualizar
+                </button>
+              </div>
+            </div>
+            <div class="tw">
+              <table>
+                <thead><tr><th>Nombre</th><th>RUT</th><th>Diagnóstico</th><th>Lat.</th><th>F. lesión</th><th>F. ingreso</th><th>Días</th><th>Teléfono</th><th>RX</th><th>Estado</th><th></th></tr></thead>
+                <tbody id="lista-tb"><tr><td colspan="11" class="empty-s">Cargando...</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TABLA PABELLON -->
+        <div id="view-pabellon" class="vp" style="display:none">
+          <div id="sb-pab" class="sbar load"><span class="dot a"></span><span>Cargando tabla...</span><span class="spin" style="margin-left:auto"></span></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:12px;flex-wrap:wrap">
+            <div style="display:flex;align-items:center;gap:8px">
+              <button class="btn" onclick="changeWeek(-1)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+              <span style="font-size:13px;font-weight:500" id="week-lbl">Semana</span>
+              <button class="btn" onclick="changeWeek(1)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
+            </div>
+            <div style="display:flex;gap:7px">
+              <button class="btn" onclick="addPabellon()">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Añadir pabellón
+              </button>
+              <button class="btn btn-p" onclick="openNuevoCX()">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Añadir cirugía
+              </button>
+            </div>
+          </div>
+          <div id="pab-container"></div>
+        </div>
+
+        <!-- CALENDARIO -->
+        <div id="view-calendario" class="vp" style="display:none">
+          <div class="card" style="padding:16px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+              <button class="btn" onclick="calPrev()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+              <span style="font-size:14px;font-weight:500" id="cal-lbl"></span>
+              <button class="btn" onclick="calNext()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:4px">
+              <div class="cal-dn">Lun</div><div class="cal-dn">Mar</div><div class="cal-dn">Mié</div>
+              <div class="cal-dn">Jue</div><div class="cal-dn">Vie</div><div class="cal-dn">Sáb</div><div class="cal-dn">Dom</div>
+            </div>
+            <div class="cal-grid" id="cal-grid"></div>
+          </div>
+        </div>
+
+        <!-- CONFIG -->
+        <div id="view-config" class="vp" style="display:none">
+          <div style="max-width:480px">
+            <div class="cfg-sec">
+              <div class="cfg-hd">Google Sheets — Lista de espera (DIFERIDOS)</div>
+              <div class="cfg-bd">
+                <div class="fg"><label>ID de la hoja</label><input type="text" id="cfg-sid" value="1V48vqYerSrQ2IC6hikePzMoCAASBZfzR3n_i9OvWjgI"/></div>
+                <div class="fg"><label>Nombre de la pestaña</label><input type="text" id="cfg-stab" value="DIFERIDOS"/></div>
+              </div>
+            </div>
+            <div class="cfg-sec">
+              <div class="cfg-hd">Google Sheets — Tabla quirúrgica</div>
+              <div class="cfg-bd">
+                <div class="fg"><label>ID de la hoja</label><input type="text" id="cfg-tid" value="1DBjeYGeLSSRG68CljiswtZoo_f5oG6wSTFoVaLbfqYE"/></div>
+                <div class="fg"><label>Nombre de la pestaña</label><input type="text" id="cfg-ttab" value="Junio 2026"/></div>
+              </div>
+            </div>
+            <div class="cfg-sec">
+              <div class="cfg-hd">OAuth — Client ID de Google Cloud</div>
+              <div class="cfg-bd">
+                <div class="fg"><label>Client ID</label><input type="text" id="cfg-cid" placeholder="XXXX-xxxx.apps.googleusercontent.com"/></div>
+                <p style="font-size:11px;color:var(--text-2);line-height:1.6">Obtén este valor en <strong>console.cloud.google.com</strong><br>→ APIs &amp; Services → Credentials → OAuth 2.0 Client IDs.<br>Consulta <strong>SETUP.md</strong> para instrucciones paso a paso.</p>
+              </div>
+            </div>
+            <button class="btn btn-p" onclick="saveConfig()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
+              Guardar configuración
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Nuevo en espera -->
+<div class="mbg" id="modal-ne">
+  <div class="modal">
+    <div class="mhd"><h2>Registrar desde urgencia</h2><button class="bti" onclick="closeM('modal-ne')">✕</button></div>
+    <div class="mbd">
+      <div class="fg2">
+        <div class="fg" style="grid-column:1/-1"><label>Nombre completo *</label><input type="text" id="ne-nom" placeholder="Apellido, Nombre"/></div>
+        <div class="fg"><label>RUT *</label><input type="text" id="ne-rut" placeholder="12.345.678-9"/></div>
+        <div class="fg"><label>Teléfono</label><input type="text" id="ne-tel" placeholder="+56 9 XXXX XXXX"/></div>
+        <div class="fg" style="grid-column:1/-1"><label>Diagnóstico *</label><input type="text" id="ne-dx" placeholder="Diagnóstico principal"/></div>
+        <div class="fg"><label>Lateralidad</label><select id="ne-lat"><option value="Der">Derecha</option><option value="Izq">Izquierda</option><option value="Bil">Bilateral</option></select></div>
+        <div class="fg"><label>Fecha de lesión *</label><input type="date" id="ne-fl"/></div>
+        <div class="fg" style="grid-column:1/-1"><label>Observaciones</label><textarea id="ne-obs" placeholder="Notas..."></textarea></div>
+      </div>
+      <div class="ssep">Radiografías iniciales</div>
+      <div class="uz" onclick="document.getElementById('fi-ne').click()">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/></svg>
+        <p>Subir radiografías (JPG, PNG) — múltiples archivos</p>
+      </div>
+      <input type="file" id="fi-ne" multiple accept="image/*" style="display:none" onchange="prevF(event,'pv-ne','img-ne')"/>
+      <div class="prev-row" id="pv-ne"></div>
+      <input type="hidden" id="img-ne" value=""/>
+    </div>
+    <div class="mft">
+      <button class="btn" onclick="closeM('modal-ne')">Cancelar</button>
+      <button class="btn btn-p" onclick="guardarEspera()">Guardar en lista de espera</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Buscar RUT -->
+<div class="mbg" id="modal-buscar">
+  <div class="modal">
+    <div class="mhd"><h2>Buscar paciente por RUT</h2><button class="bti" onclick="closeM('modal-buscar')">✕</button></div>
+    <div class="mbd">
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <input type="text" id="brut" placeholder="12.345.678-9" style="flex:1;font-size:13px;padding:7px 10px;border-radius:var(--r);border:0.5px solid var(--border-mid);background:var(--surface);color:var(--text)" onkeydown="if(event.key==='Enter')buscarRut()"/>
+        <button class="btn btn-p" onclick="buscarRut()">Buscar</button>
+      </div>
+      <div id="bres"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Agendar -->
+<div class="mbg" id="modal-ag">
+  <div class="modal">
+    <div class="mhd"><h2 id="ag-title">Agendar a pabellón</h2><button class="bti" onclick="closeM('modal-ag')">✕</button></div>
+    <div class="mbd">
+      <div style="background:var(--bg);border-radius:var(--r);padding:9px 12px;font-size:12px;color:var(--text-2);margin-bottom:14px;border:0.5px solid var(--border)">
+        Datos precargados desde la lista de espera. Completa los datos quirúrgicos.
+      </div>
+      <div class="fg2">
+        <div class="fg"><label>Fecha del pabellón *</label><input type="date" id="ag-f"/></div>
+        <div class="fg"><label>Nombre del pabellón *</label><input type="text" id="ag-pab" placeholder="Ej: Pabellón 3"/></div>
+        <div class="fg"><label>Turno</label><select id="ag-tur"><option>1°</option><option>2°</option><option>3°</option><option>4°</option><option>5°</option></select></div>
+        <div class="fg"><label>Anestesia</label><select id="ag-an"><option>Regional</option><option>General</option><option>Local + sedación</option><option>Local</option></select></div>
+        <div class="fg" style="grid-column:1/-1"><label>Tipo de cirugía (CX) *</label><input type="text" id="ag-cx"/></div>
+        <div class="fg"><label>Código</label><input type="text" id="ag-cod"/></div>
+        <div class="fg"><label>Cirujanos</label><input type="text" id="ag-cir" placeholder="García / Rojas"/></div>
+        <div class="fg" style="grid-column:1/-1"><label>Insumos especiales</label><input type="text" id="ag-ins"/></div>
+        <div class="fg"><label>Biopsia</label><select id="ag-bio"><option>No</option><option>Sí</option></select></div>
+        <div class="fg" style="grid-column:1/-1"><label>Comentarios</label><textarea id="ag-com"></textarea></div>
+      </div>
+      <div class="ssep">Radiografías preoperatorias adicionales</div>
+      <div class="uz" onclick="document.getElementById('fi-ag').click()">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/></svg>
+        <p>Añadir RX preoperatorias</p>
+      </div>
+      <input type="file" id="fi-ag" multiple accept="image/*" style="display:none" onchange="prevF(event,'pv-ag','img-ag')"/>
+      <div class="prev-row" id="pv-ag"></div>
+      <input type="hidden" id="img-ag" value=""/>
+      <input type="hidden" id="ag-ridx" value=""/>
+    </div>
+    <div class="mft">
+      <button class="btn" onclick="closeM('modal-ag')">Cancelar</button>
+      <button class="btn btn-p" onclick="confirmarAg()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Confirmar y sincronizar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Nueva CX directa -->
+<div class="mbg" id="modal-ncx">
+  <div class="modal">
+    <div class="mhd"><h2>Añadir cirugía a la tabla</h2><button class="bti" onclick="closeM('modal-ncx')">✕</button></div>
+    <div class="mbd">
+      <div style="background:var(--bg);border-radius:var(--r);padding:9px 12px;font-size:12px;color:var(--text-2);margin-bottom:14px;border:0.5px solid var(--border)">
+        ¿El paciente está en lista de espera?
+        <span style="color:var(--blue);cursor:pointer;font-weight:500" onclick="closeM('modal-ncx');openM('modal-buscar')">Busca por RUT para precargar datos →</span>
+      </div>
+      <div class="fg2">
+        <div class="fg" style="grid-column:1/-1"><label>Nombre completo *</label><input type="text" id="nc-nom" placeholder="Apellido, Nombre"/></div>
+        <div class="fg"><label>RUT *</label><input type="text" id="nc-rut"/></div>
+        <div class="fg"><label>Edad</label><input type="number" id="nc-edad" min="0" max="120"/></div>
+        <div class="fg" style="grid-column:1/-1"><label>Diagnóstico *</label><input type="text" id="nc-dx"/></div>
+        <div class="fg"><label>Lateralidad</label><select id="nc-lat"><option value="Der">Derecha</option><option value="Izq">Izquierda</option><option value="Bil">Bilateral</option></select></div>
+        <div class="fg"><label>Fecha *</label><input type="date" id="nc-f"/></div>
+        <div class="fg"><label>Pabellón *</label><input type="text" id="nc-pab" placeholder="Ej: Pabellón 3"/></div>
+        <div class="fg"><label>Turno</label><select id="nc-tur"><option>1°</option><option>2°</option><option>3°</option><option>4°</option></select></div>
+        <div class="fg" style="grid-column:1/-1"><label>Cirugía (CX) *</label><input type="text" id="nc-cx"/></div>
+        <div class="fg"><label>Código</label><input type="text" id="nc-cod"/></div>
+        <div class="fg"><label>Anestesia</label><select id="nc-an"><option>Regional</option><option>General</option><option>Local + sedación</option><option>Local</option></select></div>
+        <div class="fg" style="grid-column:1/-1"><label>Cirujanos</label><input type="text" id="nc-cir"/></div>
+        <div class="fg" style="grid-column:1/-1"><label>Insumos especiales</label><input type="text" id="nc-ins"/></div>
+        <div class="fg"><label>Biopsia</label><select id="nc-bio"><option>No</option><option>Sí</option></select></div>
+        <div class="fg" style="grid-column:1/-1"><label>Comentarios</label><textarea id="nc-com"></textarea></div>
+      </div>
+      <div class="ssep">Radiografías</div>
+      <div class="uz" onclick="document.getElementById('fi-nc').click()">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/></svg>
+        <p>Subir radiografías</p>
+      </div>
+      <input type="file" id="fi-nc" multiple accept="image/*" style="display:none" onchange="prevF(event,'pv-nc','img-nc')"/>
+      <div class="prev-row" id="pv-nc"></div>
+      <input type="hidden" id="img-nc" value=""/>
+    </div>
+    <div class="mft">
+      <button class="btn" onclick="closeM('modal-ncx')">Cancelar</button>
+      <button class="btn btn-p" onclick="guardarCX()">Guardar y sincronizar</button>
+    </div>
+  </div>
+</div>
+
+<!-- VIEWER -->
+<div id="viewer" onclick="this.classList.remove('open')">
+  <button class="vc" onclick="document.getElementById('viewer').classList.remove('open')">✕</button>
+  <img id="viewer-img" src="" alt="RX"/>
+</div>
+<div id="toast"></div>
+
+<script>
+// ==================== CONFIG ====================
+const CFG = {
+  clientId: '',
+  sheetD: '1V48vqYerSrQ2IC6hikePzMoCAASBZfzR3n_i9OvWjgI',
+  tabD: 'DIFERIDOS',
+  sheetT: '1DBjeYGeLSSRG68CljiswtZoo_f5oG6wSTFoVaLbfqYE',
+  tabT: 'Junio 2026',
+};
+const SCOPES = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/oauth2/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
+const DISC = 'https://sheets.googleapis.com/$discovery/rest?version=v4';
+
+// ==================== LOCAL STORAGE ====================
+const ls = { get: k => { try { return JSON.parse(localStorage.getItem(k)||'null'); } catch(e){ return null; } }, set: (k,v) => { try { localStorage.setItem(k,JSON.stringify(v)); } catch(e){} } };
+
+// ==================== TOAST ====================
+function toast(msg, dur=3200) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), dur);
+}
+
+// ==================== MODAL ====================
+function openM(id) { document.getElementById(id).classList.add('open'); }
+function closeM(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.mbg').forEach(bg => bg.addEventListener('click', e => { if(e.target===bg) bg.classList.remove('open'); }));
+
+// ==================== NAV ====================
+const topMap = {
+  lista: { t:'Lista de espera', a:`<button class="btn" onclick="openM('modal-buscar')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Buscar por RUT</button><button class="btn btn-p" onclick="openM('modal-ne')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Registrar desde urgencia</button>` },
+  pabellon: { t:'Tabla quirúrgica', a:`<button class="btn" onclick="addPabellon()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Añadir pabellón</button><button class="btn btn-p" onclick="openNuevoCX()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Añadir cirugía</button>` },
+  calendario: { t:'Calendario', a:'' },
+  config: { t:'Configuración', a:'' },
+};
+function navTo(el) {
+  const v = el.dataset.view;
+  document.querySelectorAll('.vp').forEach(p => p.style.display='none');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-'+v).style.display='block';
+  el.classList.add('active');
+  document.getElementById('view-title').textContent = topMap[v].t;
+  document.getElementById('topbar-actions').innerHTML = topMap[v].a;
+  if(v==='lista') loadLista();
+  if(v==='pabellon') loadPabellon();
+  if(v==='calendario') renderCal();
+  if(v==='config') loadCfg();
+}
+
+// ==================== GOOGLE AUTH ====================
+let tokenClient, gapiOk=false, gisOk=false, accessToken=null;
+
+function loadGAPI() {
+  const saved = ls.get('gtoken');
+  const cid = ls.get('appCFG')?.clientId || CFG.clientId;
+  if(!cid) { showNoCID(); return; }
+  Object.assign(CFG, ls.get('appCFG')||{});
+
+  const s1 = document.createElement('script'); s1.src='https://apis.google.com/js/api.js';
+  s1.onload = () => gapi.load('client', async () => {
+    await gapi.client.init({ discoveryDocs:[DISC] });
+    gapiOk=true;
+    if(saved && saved.expires>Date.now()) { gapi.client.setToken({access_token:saved.token}); accessToken=saved.token; fetchUser(saved.token); showApp(); }
+    else maybeEnableAuth();
+  });
+  document.head.appendChild(s1);
+
+  const s2 = document.createElement('script'); s2.src='https://accounts.google.com/gsi/client';
+  s2.onload = () => {
+    tokenClient = google.accounts.oauth2.initTokenClient({ client_id:cid, scope:SCOPES, callback:handleTok });
+    gisOk=true; maybeEnableAuth();
+  };
+  document.head.appendChild(s2);
+}
+
+function showNoCID() {
+  document.getElementById('auth-screen').innerHTML = `<div class="auth-card"><h1 style="font-size:16px;margin-bottom:12px">Configuración pendiente</h1><p>Falta configurar el <strong>Client ID</strong> de Google Cloud para activar la autenticación.</p><p style="margin-top:12px">Abre el archivo <strong>SETUP.md</strong> incluido con la app para instrucciones paso a paso (toma ~15 min).</p><p style="font-size:11px;color:var(--text-3);margin-top:16px;margin-bottom:0">Una vez obtengas el Client ID, pégalo en <code>index.html</code> en la línea: <code>clientId: ''</code></p></div>`;
+}
+
+function maybeEnableAuth() { /* no-op: sign in only on button click */ }
+
+function signIn() {
+  const cid = ls.get('appCFG')?.clientId || CFG.clientId;
+  if(!cid) { showNoCID(); return; }
+  if(!tokenClient) { Object.assign(CFG, ls.get('appCFG')||{}); loadGAPI(); setTimeout(signIn,1500); return; }
+  tokenClient.requestAccessToken({prompt:''});
+}
+
+function handleTok(resp) {
+  if(resp.error) { toast('Error al autenticar: '+resp.error); return; }
+  accessToken = resp.access_token;
+  gapi.client.setToken(resp);
+  ls.set('gtoken',{token:accessToken,expires:Date.now()+(resp.expires_in-60)*1000});
+  fetchUser(accessToken); showApp();
+}
+
+function fetchUser(token) {
+  fetch('https://www.googleapis.com/oauth2/v2/userinfo',{headers:{Authorization:'Bearer '+token}})
+    .then(r=>r.json()).then(u=>{
+      const n=u.name||u.email||'Usuario';
+      const ini=n.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+      document.getElementById('user-name').textContent=n;
+      document.getElementById('user-initials').textContent=ini;
+      if(u.picture) document.getElementById('user-avatar').innerHTML=`<img src="${u.picture}" alt="${n}"/>`;
+    });
+}
+
+function showApp() {
+  document.getElementById('auth-screen').style.display='none';
+  document.getElementById('app').style.display='block';
+  loadLista();
+}
+
+function signOut() {
+  if(accessToken) google.accounts.oauth2.revoke(accessToken,()=>{});
+  accessToken=null; ls.set('gtoken',null); location.reload();
+}
+
+// ==================== SHEETS ====================
+const getSheet = (id,range) => gapi.client.sheets.spreadsheets.values.get({spreadsheetId:id,range}).then(r=>r.result.values||[]);
+const appendRow = (id,range,vals) => gapi.client.sheets.spreadsheets.values.append({spreadsheetId:id,range,valueInputOption:'USER_ENTERED',insertDataOption:'INSERT_ROWS',resource:{values:[vals]}});
+const updateRow = (id,range,vals) => gapi.client.sheets.spreadsheets.values.update({spreadsheetId:id,range,valueInputOption:'USER_ENTERED',resource:{values:[vals]}});
+
+// ==================== UTILS ====================
+function diasDesde(fs) {
+  if(!fs) return null;
+  const p=fs.split('/'); let d;
+  if(p.length===3) d=new Date(p[2],p[1]-1,p[0]);
+  else d=new Date(fs);
+  if(isNaN(d)) return null;
+  return Math.floor((Date.now()-d.getTime())/86400000);
+}
+function dtag(n) {
+  if(n===null||n===undefined) return '<span class="dtag" style="background:var(--bg);color:var(--text-2)">—</span>';
+  if(n>30) return `<span class="dtag durg">${n} días</span>`;
+  if(n>14) return `<span class="dtag dwarn">${n} días</span>`;
+  return `<span class="dtag dok">${n} días</span>`;
+}
+function sbadge(dias) {
+  if(dias===null) return '<span class="badge bw">En espera</span>';
+  if(dias>30) return '<span class="badge bu">Urgente</span>';
+  if(dias>14) return '<span class="badge br">Listo</span>';
+  return '<span class="badge bw">En espera</span>';
+}
+function setSB(id, state, msg) {
+  const el=document.getElementById(id); if(!el) return;
+  const dc=state==='ok'?'':state==='err'?'r':'a';
+  const ld=state==='load'?'<span class="spin" style="margin-left:auto"></span>':'';
+  el.className='sbar'+(state==='err'?' err':state==='load'?' load':'');
+  el.innerHTML=`<span class="dot ${dc}"></span><span>${msg}</span>${ld}`;
+}
+function fmtDate(isoStr) {
+  if(!isoStr) return '';
+  const d=new Date(isoStr+'T12:00:00'); return d.toLocaleDateString('es-CL');
+}
+function clr(ids) { ids.forEach(id=>{const e=document.getElementById(id);if(e)e.value='';}); }
+
+// ==================== LISTA DE ESPERA ====================
+// Sheet columns: A=Nombre B=RUT C=Diagnóstico D=Lateralidad E=FechaLesion F=FechaIngreso G=Telefono H=Observaciones
+let listaD=[];
+async function loadLista() {
+  setSB('sb-lista','load','Cargando desde Google Sheets...');
+  if(!accessToken){setSB('sb-lista','err','Sin sesión activa');return;}
+  try {
+    const sid=document.getElementById('cfg-sid')?.value||CFG.sheetD;
+    const tab=document.getElementById('cfg-stab')?.value||CFG.tabD;
+    const rows=await getSheet(sid,`${tab}!A2:H500`);
+    listaD=rows.map((r,i)=>({ri:i+2,nom:r[0]||'',rut:r[1]||'',dx:r[2]||'',lat:r[3]||'',fl:r[4]||'',fi:r[5]||'',tel:r[6]||'',obs:r[7]||''}));
+    renderLista(); updateStats();
+    setSB('sb-lista','ok',`${listaD.length} pacientes — actualizado ${new Date().toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'})}`);
+  } catch(e) { setSB('sb-lista','err','Error: '+(e.message||e)); }
+}
+
+function renderLista() {
+  const f=document.getElementById('fil-lista')?.value||'all';
+  let rows=listaD;
+  if(f==='ready') rows=rows.filter(r=>{const d=diasDesde(r.fl);return d!==null&&d>14&&d<=30;});
+  if(f==='urgent') rows=rows.filter(r=>{const d=diasDesde(r.fl);return d!==null&&d>30;});
+  const tb=document.getElementById('lista-tb');
+  if(!rows.length){tb.innerHTML='<tr><td colspan="11" class="empty-s">No hay pacientes que coincidan.</td></tr>';return;}
+  const imgs=ls.get('imgs_e')||{};
+  tb.innerHTML=rows.map(r=>{
+    const d=diasDesde(r.fl); const hi=!!(imgs[r.rut]&&imgs[r.rut].length);
+    return `<tr>
+      <td><strong>${r.nom}</strong></td>
+      <td style="white-space:nowrap">${r.rut}</td>
+      <td>${r.dx}</td><td>${r.lat}</td>
+      <td style="white-space:nowrap">${r.fl}</td>
+      <td style="white-space:nowrap">${r.fi}</td>
+      <td>${dtag(d)}</td>
+      <td style="white-space:nowrap">${r.tel}</td>
+      <td><span class="xray ${hi?'has':''}" onclick="viewImgs('${r.rut}','e')" title="Ver RX">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="9" y2="15"/><line x1="15" y1="9" x2="15" y2="15"/><line x1="9" y1="12" x2="15" y2="12"/></svg>
+      </span></td>
+      <td>${sbadge(d)}</td>
+      <td style="display:flex;gap:3px;align-items:center">
+        <button class="bti" title="Agendar" onclick='abrirAg(${JSON.stringify(r)})' style="color:var(--blue)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </button>
+        <button class="bti" title="Añadir RX" onclick="addRxE('${r.rut}')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/></svg>
+        </button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function updateStats() {
+  const tot=listaD.length;
+  const urg=listaD.filter(r=>{const d=diasDesde(r.fl);return d!==null&&d>30;}).length;
+  const lis=listaD.filter(r=>{const d=diasDesde(r.fl);return d!==null&&d>14&&d<=30;}).length;
+  const dd=listaD.map(r=>diasDesde(r.fl)).filter(d=>d!==null);
+  const prom=dd.length?Math.round(dd.reduce((a,b)=>a+b,0)/dd.length):0;
+  document.getElementById('s-total').textContent=tot;
+  document.getElementById('s-listos').textContent=lis;
+  document.getElementById('s-prom').textContent=prom;
+  document.getElementById('s-urg').textContent=urg;
+}
+
+async function guardarEspera() {
+  const nom=document.getElementById('ne-nom').value.trim();
+  const rut=document.getElementById('ne-rut').value.trim();
+  const dx=document.getElementById('ne-dx').value.trim();
+  const fl=document.getElementById('ne-fl').value;
+  if(!nom||!rut||!dx||!fl){toast('Completa los campos obligatorios (*)');return;}
+  const today=new Date().toLocaleDateString('es-CL');
+  const row=[nom,rut,dx,document.getElementById('ne-lat').value,fmtDate(fl),today,
+    document.getElementById('ne-tel').value,document.getElementById('ne-obs').value];
+  try {
+    const sid=document.getElementById('cfg-sid')?.value||CFG.sheetD;
+    const tab=document.getElementById('cfg-stab')?.value||CFG.tabD;
+    await appendRow(sid,`${tab}!A:H`,row);
+    const imgs=document.getElementById('img-ne').value;
+    if(imgs){const s=ls.get('imgs_e')||{};s[rut]=(s[rut]||[]).concat(JSON.parse(imgs));ls.set('imgs_e',s);}
+    toast('Paciente registrado y guardado en Google Sheets ✓');
+    closeM('modal-ne');
+    clr(['ne-nom','ne-rut','ne-dx','ne-tel','ne-obs','ne-fl']);
+    document.getElementById('pv-ne').innerHTML='';
+    document.getElementById('img-ne').value='';
+    loadLista();
+  } catch(e){toast('Error: '+(e.message||e));}
+}
+
+// ==================== BUSCAR RUT ====================
+function buscarRut() {
+  const rut=document.getElementById('brut').value.trim();
+  const res=document.getElementById('bres');
+  if(!rut) return;
+  const m=listaD.find(r=>r.rut.replace(/[.\-]/g,'')===rut.replace(/[.\-]/g,''));
+  if(!m){res.innerHTML=`<div class="empty-s">No se encontró ningún paciente con RUT <strong>${rut}</strong> en la lista de espera.</div>`;return;}
+  const d=diasDesde(m.fl);
+  const imgs=ls.get('imgs_e')||{};
+  const hi=!!(imgs[m.rut]&&imgs[m.rut].length);
+  res.innerHTML=`
+    <div class="chips">
+      <div class="chip"><strong>Paciente</strong>${m.nom}</div>
+      <div class="chip"><strong>RUT</strong>${m.rut}</div>
+      <div class="chip"><strong>Diagnóstico</strong>${m.dx}</div>
+      <div class="chip"><strong>Lateralidad</strong>${m.lat}</div>
+      <div class="chip"><strong>F. lesión</strong>${m.fl}</div>
+      <div class="chip"><strong>Días desde lesión</strong>${dtag(d)}</div>
+      <div class="chip"><strong>Teléfono</strong>${m.tel||'—'}</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+      <span class="xray ${hi?'has':''}" onclick="viewImgs('${m.rut}','e')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="9" y2="15"/><line x1="15" y1="9" x2="15" y2="15"/><line x1="9" y1="12" x2="15" y2="12"/></svg>
+      </span>
+      <span style="font-size:12px;color:var(--text-2)">${hi?`${imgs[m.rut].length} imagen(es)`:'Sin RX aún'}</span>
+      <button class="btn" style="margin-left:auto" onclick="addRxE('${m.rut}')">+ Añadir RX</button>
+    </div>
+    <div style="border-top:0.5px solid var(--border);padding-top:12px;display:flex;justify-content:flex-end;gap:8px">
+      <button class="btn btn-s" onclick="closeM('modal-buscar');abrirAg(${JSON.stringify(m)})">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Agendar a pabellón
+      </button>
+    </div>`;
+}
+
+// ==================== AGENDAR ====================
+function abrirAg(p) {
+  document.getElementById('ag-title').textContent='Agendar a pabellón — '+p.nom;
+  document.getElementById('ag-ridx').value=p.ri||'';
+  ['ag-cx','ag-pab','ag-cod','ag-cir','ag-ins','ag-com'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('pv-ag').innerHTML='';
+  document.getElementById('img-ag').value='';
+  window._agP=p;
+  openM('modal-ag');
+}
+
+async function confirmarAg() {
+  const p=window._agP; if(!p) return;
+  const f=document.getElementById('ag-f').value;
+  const pab=document.getElementById('ag-pab').value.trim();
+  const cx=document.getElementById('ag-cx').value.trim();
+  if(!f||!pab||!cx){toast('Completa los campos obligatorios (*)');return;}
+  const row=[document.getElementById('ag-tur').value,p.nom,p.rut,'',p.dx,cx,p.lat,
+    document.getElementById('ag-cir').value,document.getElementById('ag-an').value,
+    document.getElementById('ag-cod').value,document.getElementById('ag-ins').value,
+    document.getElementById('ag-bio').value,document.getElementById('ag-com').value,
+    fmtDate(f),pab,'Confirmado'];
+  try {
+    const sid=document.getElementById('cfg-tid')?.value||CFG.sheetT;
+    const tab=document.getElementById('cfg-ttab')?.value||CFG.tabT;
+    await appendRow(sid,`${tab}!A:P`,row);
+    const imgs=document.getElementById('img-ag').value;
+    if(imgs){const s=ls.get('imgs_t')||{};const k=p.rut+'_'+fmtDate(f);s[k]=(s[k]||[]).concat(JSON.parse(imgs));ls.set('imgs_t',s);}
+    toast('Cirugía agendada y sincronizada ✓');
+    closeM('modal-ag');
+    if(document.getElementById('view-pabellon').style.display!=='none') loadPabellon();
+  } catch(e){toast('Error: '+(e.message||e));}
+}
+
+// ==================== TABLA PABELLÓN ====================
+// Sheet columns A:Turno B:Nombre C:RUT D:Edad E:DX F:CX G:Lat H:Cirujanos I:Anestesia J:Codigo K:Insumos L:Biopsia M:Comentario N:Fecha O:Pabellon P:Estado
+let tablaD=[]; let wkOff=0;
+
+function weekDates(off) {
+  const now=new Date(), day=now.getDay()||7, m=new Date(now);
+  m.setDate(now.getDate()-day+1+off*7);
+  const s=new Date(m); s.setDate(m.getDate()+6);
+  return {mon:m,sun:s};
+}
+function changeWeek(d){wkOff+=d;loadPabellon();}
+
+async function loadPabellon() {
+  const {mon,sun}=weekDates(wkOff);
+  const fmt=d=>d.toLocaleDateString('es-CL',{day:'numeric',month:'short',year:'numeric'});
+  document.getElementById('week-lbl').textContent=`Semana del ${fmt(mon)} al ${fmt(sun)}`;
+  setSB('sb-pab','load','Cargando tabla quirúrgica...');
+  if(!accessToken){setSB('sb-pab','err','Sin sesión activa');return;}
+  try {
+    const sid=document.getElementById('cfg-tid')?.value||CFG.sheetT;
+    const tab=document.getElementById('cfg-ttab')?.value||CFG.tabT;
+    const rows=await getSheet(sid,`${tab}!A2:P500`);
+    tablaD=rows.map((r,i)=>({ri:i+2,tur:r[0]||'',nom:r[1]||'',rut:r[2]||'',edad:r[3]||'',
+      dx:r[4]||'',cx:r[5]||'',lat:r[6]||'',cir:r[7]||'',an:r[8]||'',cod:r[9]||'',
+      ins:r[10]||'',bio:r[11]||'',com:r[12]||'',fecha:r[13]||'',pab:r[14]||'',est:r[15]||''}));
+    const wk=tablaD.filter(r=>{
+      const p=r.fecha.split('/'); if(p.length<3) return false;
+      const d=new Date(p[2],p[1]-1,p[0]); return d>=mon&&d<=sun;
+    });
+    renderPabs(wk);
+    setSB('sb-pab','ok',`${wk.length} cirugías esta semana`);
+  } catch(e){setSB('sb-pab','err','Error: '+(e.message||e));}
+}
+
+function renderPabs(rows) {
+  const c=document.getElementById('pab-container');
+  const groups={};
+  rows.forEach(r=>{const k=r.fecha+'||'+r.pab;if(!groups[k])groups[k]={fecha:r.fecha,pab:r.pab,rows:[]};groups[k].rows.push(r);});
+  const extra=ls.get('xpab_'+wkOff)||[];
+  const used=new Set(Object.keys(groups));
+  extra.forEach(e=>{if(!used.has(e.k))groups[e.k]={fecha:e.fecha,pab:e.pab,rows:[]};});
+  const sorted=Object.values(groups).sort((a,b)=>{
+    const da=a.fecha.split('/').reverse().join(''),db=b.fecha.split('/').reverse().join('');
+    return da.localeCompare(db)||a.pab.localeCompare(b.pab);
+  });
+  if(!sorted.length){c.innerHTML='<div class="empty-s">No hay cirugías esta semana.<br>Añade un pabellón o registra una cirugía.</div>';return;}
+  const imgs=ls.get('imgs_t')||{};
+  c.innerHTML=sorted.map(g=>{
+    const rhtml=g.rows.length?g.rows.map(r=>{
+      const hi=!!(imgs[r.rut+'_'+r.fecha]);
+      return `<tr>
+        <td><span class="pill">${r.tur||'—'}</span></td>
+        <td><strong>${r.nom}</strong></td><td style="white-space:nowrap">${r.rut}</td>
+        <td>${r.edad}</td><td>${r.dx}</td><td>${r.cx}</td><td>${r.lat}</td>
+        <td>${r.cir}</td><td>${r.an}</td>
+        <td><span class="xray ${hi?'has':''}" onclick="viewImgs('${r.rut}','t')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="9" y2="15"/><line x1="15" y1="9" x2="15" y2="15"/><line x1="9" y1="12" x2="15" y2="12"/></svg>
+        </span></td>
+        <td><span class="badge ${r.est==='Confirmado'?'bs':'bw'}">${r.est||'Pendiente'}</span></td>
+        <td><button class="bti"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button></td>
+      </tr>`;
+    }).join(''):`<tr><td colspan="12" class="empty-s" style="padding:14px">Sin cirugías. <span style="color:var(--blue);cursor:pointer" onclick="openNuevoCX()">Añadir →</span></td></tr>`;
+    return `<div class="pab-block">
+      <div class="pab-hdr">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="opacity:.4;flex-shrink:0"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+        <input class="pab-input" value="${g.pab} — ${g.fecha}"/>
+        <span style="font-size:11px;color:var(--text-2);margin-right:6px">${g.rows.length} caso(s)</span>
+        <button class="bti d" onclick="rmPab('${g.fecha}','${g.pab}',this)" title="Eliminar bloque">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
+        </button>
+      </div>
+      <div class="tw"><table>
+        <thead><tr><th>Turno</th><th>Nombre</th><th>RUT</th><th>Edad</th><th>Diagnóstico</th><th>CX</th><th>Lat.</th><th>Cirujanos</th><th>Anestesia</th><th>RX</th><th>Estado</th><th></th></tr></thead>
+        <tbody>${rhtml}</tbody>
+      </table></div>
+    </div>`;
+  }).join('');
+}
+
+function addPabellon() {
+  const f=prompt('Fecha del pabellón (DD/MM/AAAA):'); if(!f) return;
+  const n=prompt('Nombre del pabellón:')||'Pabellón nuevo';
+  const k=f+'||'+n, ex=ls.get('xpab_'+wkOff)||[];
+  ex.push({k,fecha:f,pab:n}); ls.set('xpab_'+wkOff,ex); loadPabellon();
+}
+
+function rmPab(fecha,pab,btn) {
+  if(!confirm(`¿Eliminar bloque "${pab} — ${fecha}"?\nLas cirugías en Google Sheets no se borran.`)) return;
+  const ex=(ls.get('xpab_'+wkOff)||[]).filter(e=>e.k!==fecha+'||'+pab);
+  ls.set('xpab_'+wkOff,ex); btn.closest('.pab-block').remove();
+}
+
+function openNuevoCX() {
+  ['nc-nom','nc-rut','nc-dx','nc-cx','nc-cod','nc-cir','nc-ins','nc-com'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('pv-nc').innerHTML=''; document.getElementById('img-nc').value='';
+  openM('modal-ncx');
+}
+
+async function guardarCX() {
+  const nom=document.getElementById('nc-nom').value.trim();
+  const rut=document.getElementById('nc-rut').value.trim();
+  const cx=document.getElementById('nc-cx').value.trim();
+  const f=document.getElementById('nc-f').value;
+  const pab=document.getElementById('nc-pab').value.trim();
+  if(!nom||!rut||!cx||!f||!pab){toast('Completa los campos obligatorios (*)');return;}
+  const row=[document.getElementById('nc-tur').value,nom,rut,document.getElementById('nc-edad').value,
+    document.getElementById('nc-dx').value,cx,document.getElementById('nc-lat').value,
+    document.getElementById('nc-cir').value,document.getElementById('nc-an').value,
+    document.getElementById('nc-cod').value,document.getElementById('nc-ins').value,
+    document.getElementById('nc-bio').value,document.getElementById('nc-com').value,fmtDate(f),pab,'Pendiente'];
+  try {
+    const sid=document.getElementById('cfg-tid')?.value||CFG.sheetT;
+    const tab=document.getElementById('cfg-ttab')?.value||CFG.tabT;
+    await appendRow(sid,`${tab}!A:P`,row);
+    const imgs=document.getElementById('img-nc').value;
+    if(imgs){const s=ls.get('imgs_t')||{};const k=rut+'_'+fmtDate(f);s[k]=(s[k]||[]).concat(JSON.parse(imgs));ls.set('imgs_t',s);}
+    toast('Cirugía guardada ✓'); closeM('modal-ncx'); loadPabellon();
+  } catch(e){toast('Error: '+(e.message||e));}
+}
+
+// ==================== IMÁGENES ====================
+function prevF(ev, prvId, hidId) {
+  const row=document.getElementById(prvId);
+  const ex=document.getElementById(hidId).value?JSON.parse(document.getElementById(hidId).value):[];
+  Array.from(ev.target.files).forEach(f=>{
+    const rd=new FileReader(); rd.onload=e=>{
+      const b64=e.target.result; ex.push(b64);
+      document.getElementById(hidId).value=JSON.stringify(ex);
+      const img=document.createElement('img'); img.src=b64;
+      img.onclick=()=>viewerOpen(b64); row.appendChild(img);
+    }; rd.readAsDataURL(f);
+  });
+}
+
+function viewImgs(rut,src) {
+  const store=ls.get('imgs_'+src)||{};
+  const imgs=store[rut]||[];
+  if(!imgs.length){toast('Sin radiografías guardadas para este paciente.');return;}
+  viewerOpen(imgs[0]);
+}
+
+function addRxE(rut) {
+  const inp=document.createElement('input'); inp.type='file'; inp.accept='image/*'; inp.multiple=true;
+  inp.onchange=e=>Array.from(e.target.files).forEach(f=>{
+    const rd=new FileReader(); rd.onload=ev=>{
+      const s=ls.get('imgs_e')||{}; s[rut]=(s[rut]||[]).concat([ev.target.result]);
+      ls.set('imgs_e',s); toast('RX guardada ✓'); renderLista();
+    }; rd.readAsDataURL(f);
+  }); inp.click();
+}
+
+function viewerOpen(src) {
+  document.getElementById('viewer-img').src=src;
+  document.getElementById('viewer').classList.add('open');
+}
+
+// ==================== CALENDARIO ====================
+let calY,calM;
+function initCal(){const n=new Date();calY=n.getFullYear();calM=n.getMonth();}
+function calPrev(){calM--;if(calM<0){calM=11;calY--;}renderCal();}
+function calNext(){calM++;if(calM>11){calM=0;calY++;}renderCal();}
+function renderCal(){
+  if(calY===undefined) initCal();
+  const mos=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  document.getElementById('cal-lbl').textContent=`${mos[calM]} ${calY}`;
+  const grid=document.getElementById('cal-grid');
+  const first=new Date(calY,calM,1).getDay()||7;
+  const days=new Date(calY,calM+1,0).getDate();
+  const tod=new Date();
+  const evMap={};
+  tablaD.forEach(r=>{
+    const p=r.fecha.split('/'); if(p.length<3) return;
+    const d=new Date(p[2],p[1]-1,p[0]);
+    if(d.getMonth()===calM&&d.getFullYear()===calY){
+      const k=d.getDate(); if(!evMap[k])evMap[k]=[];
+      evMap[k].push(r.nom.split(',')[0]+(r.pab?' · '+r.pab:''));
+    }
+  });
+  let h='';
+  for(let i=1;i<first;i++) h+='<div class="cal-cell empty"></div>';
+  for(let d=1;d<=days;d++){
+    const it=d===tod.getDate()&&calM===tod.getMonth()&&calY===tod.getFullYear();
+    const evs=evMap[d]||[];
+    h+=`<div class="cal-cell ${it?'today':''}"><div class="cal-num">${d}</div>
+      ${evs.slice(0,3).map((e,i)=>`<div class="cal-ev" style="background:${i%2===0?'var(--blue-l)':'var(--green-l)'};color:${i%2===0?'var(--blue-d)':'#27500A'}">${e}</div>`).join('')}
+      ${evs.length>3?`<div style="font-size:9px;color:var(--text-2);padding:1px 3px">+${evs.length-3} más</div>`:''}
+    </div>`;
+  }
+  for(let i=0;i<(7-(days+first-2)%7)%7;i++) h+='<div class="cal-cell empty"></div>';
+  grid.innerHTML=h;
+}
+
+// ==================== CONFIG ====================
+function loadCfg(){
+  document.getElementById('cfg-cid').value=CFG.clientId||'';
+  document.getElementById('cfg-tid').value=CFG.sheetT;
+  document.getElementById('cfg-ttab').value=CFG.tabT;
+  document.getElementById('cfg-sid').value=CFG.sheetD;
+  document.getElementById('cfg-stab').value=CFG.tabD;
+}
+function saveConfig(){
+  CFG.clientId=document.getElementById('cfg-cid').value.trim();
+  CFG.sheetT=document.getElementById('cfg-tid').value.trim();
+  CFG.tabT=document.getElementById('cfg-ttab').value.trim();
+  CFG.sheetD=document.getElementById('cfg-sid').value.trim();
+  CFG.tabD=document.getElementById('cfg-stab').value.trim();
+  ls.set('appCFG',CFG); toast('Configuración guardada ✓');
+}
+
+// ==================== INIT ====================
+(function(){const s=ls.get('appCFG');if(s)Object.assign(CFG,s);})();
+initCal();
+loadGAPI();
+</script>
+</body>
+</html>
