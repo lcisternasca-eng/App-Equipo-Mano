@@ -421,15 +421,35 @@ function loadGAPI(){
   const cid=CFG.clientId;
   if(!cid){showNoCID();return;}
   const saved=ls.get('gtoken');
+  let gapiReady=false,gsiReady=false;
+
+  function checkBothReady(){
+    if(!gapiReady||!gsiReady)return;
+    const btn=document.querySelector('.btn-google');
+    if(btn){btn.disabled=false;btn.style.opacity='1';btn.style.cursor='pointer';}
+    if(saved&&saved.expires>Date.now()){
+      gapi.client.setToken({access_token:saved.token});
+      accessToken=saved.token;
+      fetchUser(saved.token);
+      showApp();
+    }
+  }
+
+  const btn=document.querySelector('.btn-google');
+  if(btn){btn.disabled=true;btn.style.opacity='0.5';btn.style.cursor='wait';}
+
   const s1=document.createElement('script');s1.src='https://apis.google.com/js/api.js';
   s1.onload=()=>gapi.load('client',async()=>{
     await gapi.client.init({discoveryDocs:[DISC]});
-    gapiOk=true;
-    if(saved&&saved.expires>Date.now()){gapi.client.setToken({access_token:saved.token});accessToken=saved.token;fetchUser(saved.token);showApp();}
+    gapiOk=true;gapiReady=true;checkBothReady();
   });
   document.head.appendChild(s1);
+
   const s2=document.createElement('script');s2.src='https://accounts.google.com/gsi/client';
-  s2.onload=()=>{tokenClient=google.accounts.oauth2.initTokenClient({client_id:cid,scope:SCOPES,callback:handleTok});};
+  s2.onload=()=>{
+    tokenClient=google.accounts.oauth2.initTokenClient({client_id:cid,scope:SCOPES,callback:handleTok});
+    gsiReady=true;checkBothReady();
+  };
   document.head.appendChild(s2);
 }
 function showNoCID(){
@@ -437,7 +457,7 @@ function showNoCID(){
 }
 function signIn(){
   if(!CFG.clientId){showNoCID();return;}
-  if(!tokenClient){setTimeout(signIn,1000);return;}
+  if(!tokenClient){toast('Cargando... intenta en un momento');return;}
   tokenClient.requestAccessToken({prompt:''});
 }
 function handleTok(resp){
