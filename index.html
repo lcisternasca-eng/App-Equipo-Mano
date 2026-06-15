@@ -420,6 +420,16 @@ function loadGAPI(){
   Object.assign(CFG,ls.get('appCFG')||{});
   const cid=CFG.clientId;
   if(!cid){showNoCID();return;}
+
+  // Handle redirect-mode OAuth return: token in URL hash
+  const hash=Object.fromEntries(new URLSearchParams(window.location.hash.replace('#','')));
+  if(hash.access_token){
+    const token=hash.access_token;
+    const expires=Date.now()+(parseInt(hash.expires_in||3600)-60)*1000;
+    ls.set('gtoken',{token,expires});
+    history.replaceState(null,'',window.location.pathname); // clean URL
+  }
+
   const saved=ls.get('gtoken');
   let gapiReady=false,gsiReady=false;
 
@@ -428,6 +438,15 @@ function loadGAPI(){
     const btn=document.querySelector('.btn-google');
     if(btn){btn.disabled=false;btn.style.opacity='1';btn.style.cursor='pointer';}
     if(saved&&saved.expires>Date.now()){
+      gapi.client.setToken({access_token:saved.token});
+      accessToken=saved.token;
+      fetchUser(saved.token);
+      showApp();
+    }
+  }
+  function handleRedirectToken(){
+    // Called after redirect: token already in localStorage via hash capture above
+    if(saved&&saved.expires>Date.now()&&gapiReady){
       gapi.client.setToken({access_token:saved.token});
       accessToken=saved.token;
       fetchUser(saved.token);
@@ -447,7 +466,7 @@ function loadGAPI(){
 
   const s2=document.createElement('script');s2.src='https://accounts.google.com/gsi/client';
   s2.onload=()=>{
-    tokenClient=google.accounts.oauth2.initTokenClient({client_id:cid,scope:SCOPES,callback:handleTok});
+    tokenClient=google.accounts.oauth2.initTokenClient({client_id:cid,scope:SCOPES,callback:handleTok,ux_mode:'redirect',redirect_uri:window.location.origin+window.location.pathname});
     gsiReady=true;checkBothReady();
   };
   document.head.appendChild(s2);
@@ -458,7 +477,7 @@ function showNoCID(){
 function signIn(){
   if(!CFG.clientId){showNoCID();return;}
   if(!tokenClient){toast('Cargando... intenta en un momento');return;}
-  tokenClient.requestAccessToken({prompt:''});
+  tokenClient.requestAccessToken({prompt:'select_account'});
 }
 function handleTok(resp){
   if(resp.error){toast('Error: '+resp.error);return;}
