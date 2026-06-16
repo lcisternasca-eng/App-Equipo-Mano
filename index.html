@@ -476,7 +476,10 @@ function showNoCID(){
 }
 function signIn(){
   if(!CFG.clientId){showNoCID();return;}
-  if(!tokenClient){toast('Cargando... intenta en un momento');return;}
+  if(!tokenClient){
+    alert('Cargando autenticación, intenta de nuevo en 2 segundos.');
+    return;
+  }
   tokenClient.requestAccessToken({prompt:'select_account'});
 }
 function handleTok(resp){
