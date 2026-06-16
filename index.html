@@ -466,7 +466,13 @@ function loadGAPI(){
 
   const s2=document.createElement('script');s2.src='https://accounts.google.com/gsi/client';
   s2.onload=()=>{
-    tokenClient=google.accounts.oauth2.initTokenClient({client_id:cid,scope:SCOPES,callback:handleTok,ux_mode:'redirect',redirect_uri:window.location.origin+window.location.pathname});
+    tokenClient = google.accounts.oauth2.initTokenClient({
+  client_id:cid,
+  scope:SCOPES,
+  callback:handleTok,
+  ux_mode:'redirect',
+  redirect_uri:window.location.origin + window.location.pathname
+});
     gsiReady=true;checkBothReady();
   };
   document.head.appendChild(s2);
