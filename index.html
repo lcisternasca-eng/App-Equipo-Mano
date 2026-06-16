@@ -414,85 +414,57 @@ function navTo(el){
 }
 
 // ==================== GOOGLE AUTH ====================
-let tokenClient,gapiOk=false,accessToken=null,userEmail=null;
+let accessToken=null,userEmail=null;
 
 function loadGAPI(){
   Object.assign(CFG,ls.get('appCFG')||{});
   const cid=CFG.clientId;
   if(!cid){showNoCID();return;}
 
-  // Handle redirect-mode OAuth return: token in URL hash
-  const hash=Object.fromEntries(new URLSearchParams(window.location.hash.replace('#','')));
-  if(hash.access_token){
-    const token=hash.access_token;
-    const expires=Date.now()+(parseInt(hash.expires_in||3600)-60)*1000;
-    ls.set('gtoken',{token,expires});
-    history.replaceState(null,'',window.location.pathname); // clean URL
+  // 1) Check if we're returning from Google OAuth redirect (token in URL hash)
+  if(window.location.hash.includes('access_token')){
+    const params=new URLSearchParams(window.location.hash.substring(1));
+    const token=params.get('access_token');
+    const expiresIn=parseInt(params.get('expires_in')||'3600');
+    if(token){
+      ls.set('gtoken',{token:token,expires:Date.now()+(expiresIn-60)*1000});
+      history.replaceState(null,'',window.location.pathname);
+    }
   }
 
-  const saved=ls.get('gtoken');
-  let gapiReady=false,gsiReady=false;
-
-  function checkBothReady(){
-    if(!gapiReady||!gsiReady)return;
-    const btn=document.querySelector('.btn-google');
-    if(btn){btn.disabled=false;btn.style.opacity='1';btn.style.cursor='pointer';}
+  // 2) Load Google API client (for Sheets)
+  const s1=document.createElement('script');s1.src='https://apis.google.com/js/api.js';
+  s1.onload=()=>gapi.load('client',async()=>{
+    await gapi.client.init({discoveryDocs:[DISC]});
+    // 3) Check for saved token
+    const saved=ls.get('gtoken');
     if(saved&&saved.expires>Date.now()){
       gapi.client.setToken({access_token:saved.token});
       accessToken=saved.token;
       fetchUser(saved.token);
       showApp();
+    } else {
+      // Enable sign-in button
+      const btn=document.querySelector('.btn-google');
+      if(btn){btn.disabled=false;btn.style.opacity='1';btn.style.cursor='pointer';}
     }
-  }
-  function handleRedirectToken(){
-    // Called after redirect: token already in localStorage via hash capture above
-    if(saved&&saved.expires>Date.now()&&gapiReady){
-      gapi.client.setToken({access_token:saved.token});
-      accessToken=saved.token;
-      fetchUser(saved.token);
-      showApp();
-    }
-  }
-
-  const btn=document.querySelector('.btn-google');
-  if(btn){btn.disabled=true;btn.style.opacity='0.5';btn.style.cursor='wait';}
-
-  const s1=document.createElement('script');s1.src='https://apis.google.com/js/api.js';
-  s1.onload=()=>gapi.load('client',async()=>{
-    await gapi.client.init({discoveryDocs:[DISC]});
-    gapiOk=true;gapiReady=true;checkBothReady();
   });
   document.head.appendChild(s1);
-
-  const s2=document.createElement('script');s2.src='https://accounts.google.com/gsi/client';
-  s2.onload=()=>{
-    tokenClient = google.accounts.oauth2.initTokenClient({
-  client_id:cid,
-  scope:SCOPES,
-  callback:handleTok,
-  ux_mode:'redirect',
-  redirect_uri:window.location.origin + window.location.pathname
-});
-    gsiReady=true;checkBothReady();
-  };
-  document.head.appendChild(s2);
 }
 function showNoCID(){
   document.getElementById('auth-screen').innerHTML=`<div class="auth-card"><h1 style="font-size:16px;margin-bottom:12px">Configuración pendiente</h1><p>Falta configurar el Client ID. Abre SETUP.md para instrucciones.</p></div>`;
 }
 function signIn(){
   if(!CFG.clientId){showNoCID();return;}
-  if(!tokenClient){
-    alert('Cargando autenticación, intenta de nuevo en 2 segundos.');
-    return;
-  }
-  tokenClient.requestAccessToken({prompt:'select_account'});
-}
-function handleTok(resp){
-  if(resp.error){toast('Error: '+resp.error);return;}
-  accessToken=resp.access_token;gapi.client.setToken(resp);
-  ls.set('gtoken',{token:accessToken,expires:Date.now()+(resp.expires_in-60)*1000});
-  fetchUser(accessToken);showApp();
+  // Direct redirect to Google OAuth — no popup, no GIS library needed
+  const redirectUri=window.location.origin+window.location.pathname;
+  const authUrl='https://accounts.google.com/o/oauth2/v2/auth'
+    +'?client_id='+encodeURIComponent(CFG.clientId)
+    +'&redirect_uri='+encodeURIComponent(redirectUri)
+    +'&response_type=token'
+    +'&scope='+encodeURIComponent(SCOPES)
+    +'&prompt=select_account';
+  window.location.href=authUrl;
 }
 function fetchUser(token){
   fetch('https://www.googleapis.com/oauth2/v2/userinfo',{headers:{Authorization:'Bearer '+token}}).then(r=>r.json()).then(u=>{
@@ -504,7 +476,7 @@ function fetchUser(token){
   });
 }
 function showApp(){document.getElementById('auth-screen').style.display='none';document.getElementById('app').style.display='block';loadDiferidos();}
-function signOut(){if(accessToken)google.accounts.oauth2.revoke(accessToken,()=>{});accessToken=null;ls.set('gtoken',null);location.reload();}
+function signOut(){accessToken=null;ls.set('gtoken',null);location.reload();}
 
 // ==================== SHEETS HELPERS ====================
 const sheetsGet=(id,range)=>gapi.client.sheets.spreadsheets.values.get({spreadsheetId:id,range}).then(r=>r.result.values||[]);
