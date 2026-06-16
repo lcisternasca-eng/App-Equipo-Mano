@@ -8,14 +8,12 @@
 :root{--bg:#f5f5f3;--surface:#fff;--border:#e2e2de;--border-mid:#c8c8c2;--text:#1a1a18;--text-2:#6b6b66;--text-3:#9b9b94;--blue:#185FA5;--blue-l:#E6F1FB;--blue-d:#0C447C;--green:#3B6D11;--green-l:#EAF3DE;--amber-l:#FAEEDA;--amber-d:#633806;--red-l:#FCEBEB;--red-d:#791F1F;--r:8px;--rl:12px}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:13px}
-/* AUTH */
 #auth-screen{display:flex;align-items:center;justify-content:center;min-height:100vh}
 .auth-card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--rl);padding:40px 48px;text-align:center;max-width:380px;width:100%}
 .auth-card h1{font-size:20px;font-weight:500;margin-bottom:6px}
 .auth-card p{font-size:13px;color:var(--text-2);margin-bottom:28px;line-height:1.5}
 .btn-google{display:inline-flex;align-items:center;gap:10px;padding:10px 20px;border:0.5px solid var(--border-mid);border-radius:var(--r);background:var(--surface);color:var(--text);font-size:14px;cursor:pointer;width:100%;justify-content:center}
 .btn-google:hover{background:var(--bg)}
-/* APP */
 #app{display:none;height:100vh;overflow:hidden}
 .layout{display:flex;height:100vh}
 .sidebar{width:210px;min-width:210px;background:var(--surface);border-right:0.5px solid var(--border);display:flex;flex-direction:column}
@@ -29,9 +27,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .main{flex:1;overflow:hidden;display:flex;flex-direction:column;min-width:0}
 .topbar{background:var(--surface);border-bottom:0.5px solid var(--border);padding:12px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0}
 .topbar-title{font-size:15px;font-weight:500}
-.content{padding:16px 20px;flex:1;overflow:auto}
-.content.kanban{padding:14px 16px;overflow:hidden;display:flex;flex-direction:column}
-/* BUTTONS */
+.content{padding:18px 22px;flex:1;overflow:auto}
+.content.kanban{padding:0;overflow:hidden;display:flex;flex-direction:column}
 .btn{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:var(--r);border:0.5px solid var(--border-mid);background:transparent;color:var(--text);font-size:12px;cursor:pointer;white-space:nowrap}
 .btn:hover{background:var(--bg)}
 .btn-p{background:var(--blue);border-color:var(--blue);color:#fff}
@@ -40,58 +37,55 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .btn-s:hover{background:#27500A}
 .bti{background:transparent;border:none;color:var(--text-2);cursor:pointer;padding:4px 5px;border-radius:5px;display:inline-flex;align-items:center}
 .bti:hover{background:var(--bg);color:var(--text)}
-/* BADGES */
 .badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500}
 .b-wait{background:var(--amber-l);color:var(--amber-d)}
 .b-sched{background:var(--green-l);color:#27500A}
 .b-done{background:var(--blue-l);color:var(--blue-d)}
 .dtag{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500}
-.dok{background:var(--green-l);color:#27500A}
-.dwarn{background:var(--amber-l);color:var(--amber-d)}
-.durg{background:var(--red-l);color:var(--red-d)}
-/* PRIORIDAD */
+.dok{background:var(--green-l);color:#27500A}.dwarn{background:var(--amber-l);color:var(--amber-d)}.durg{background:var(--red-l);color:var(--red-d)}
 .prio{display:inline-block;padding:1px 7px;border-radius:4px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}
-.prio-alta{background:#FCEBEB;color:#791F1F}
-.prio-media{background:#FAEEDA;color:#633806}
-.prio-baja{background:#ecece8;color:#5b5b56}
-/* CARD / TABLE */
+.prio-alta{background:#FCEBEB;color:#791F1F}.prio-media{background:#FAEEDA;color:#633806}.prio-baja{background:#ecece8;color:#5b5b56}
 .card{background:var(--surface);border-radius:var(--rl);border:0.5px solid var(--border);overflow:hidden;margin-bottom:14px}
 .card-head{padding:11px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid var(--border);background:var(--bg)}
 .cht{font-size:13px;font-weight:500}
 .tw{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:12px;min-width:700px}
-th{padding:8px 12px;text-align:left;color:var(--text-2);font-weight:500;border-bottom:0.5px solid var(--border);font-size:11px;white-space:nowrap;background:var(--bg)}
+th{padding:8px 12px;text-align:left;color:var(--text-2);font-weight:500;border-bottom:0.5px solid var(--border);font-size:11px;white-space:nowrap;background:var(--bg);cursor:pointer}
+th:hover{color:var(--text)}
 td{padding:9px 12px;border-bottom:0.5px solid var(--border);vertical-align:middle}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:var(--bg)}
-/* STATS */
 .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
 .stat-card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r);padding:13px 14px}
 .stat-label{font-size:11px;color:var(--text-2);margin-bottom:5px}
 .stat-val{font-size:22px;font-weight:500}
-/* SYNC */
 .sbar{background:var(--green-l);border:0.5px solid #c0dd97;border-radius:var(--r);padding:9px 14px;display:flex;align-items:center;gap:9px;font-size:12px;color:#27500A;margin-bottom:14px}
 .sbar.err{background:var(--red-l);border-color:#f09595;color:var(--red-d)}
 .sbar.load{background:var(--amber-l);border-color:#FAC775;color:var(--amber-d)}
 .dot{width:7px;height:7px;border-radius:50%;background:#639922;display:inline-block;flex-shrink:0}
 .dot.r{background:#E24B4A}.dot.a{background:#EF9F27}
-/* KANBAN BOARD */
-.board-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
-.board{flex:1;overflow-x:auto;overflow-y:hidden;display:flex;gap:10px;padding-bottom:10px}
-.kcol{min-width:240px;max-width:240px;background:#ecece8;border-radius:10px;display:flex;flex-direction:column;max-height:100%}
+/* KANBAN SPLIT LAYOUT */
+.kb-wrapper{flex:1;display:flex;overflow:hidden}
+.kb-fixed{width:280px;min-width:280px;border-right:0.5px solid var(--border);display:flex;flex-direction:column;background:#e8eef5;overflow:hidden}
+.kb-fixed-hdr{padding:10px 12px;border-bottom:0.5px solid #c0ccdf;background:#dfe9f5;display:flex;align-items:center;justify-content:space-between}
+.kb-fixed-name{font-size:12px;font-weight:500;color:var(--blue-d)}
+.kb-fixed-controls{padding:8px 10px 4px;display:flex;flex-direction:column;gap:5px}
+.kb-fixed-controls input,.kb-fixed-controls select{font-size:11px;padding:5px 8px;border-radius:6px;border:0.5px solid #b8c8de;width:100%}
+.kb-fixed-body{flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:7px}
+.kb-scroll{flex:1;overflow-x:auto;overflow-y:hidden;display:flex;gap:0}
+.kcol{min-width:240px;max-width:240px;background:#ecece8;display:flex;flex-direction:column;max-height:100%;border-right:0.5px solid #d4d4d0}
 .kcol-hdr{padding:10px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid #d4d4d0}
 .kcol-name{font-size:12px;font-weight:500;color:var(--text)}
+.kcol-name-input{font-size:12px;font-weight:500;color:var(--text);border:none;background:transparent;outline:none;border-bottom:1.5px solid transparent;padding:0 2px;width:100%}
+.kcol-name-input:focus{border-bottom-color:var(--blue)}
 .kcol-day{font-size:10px;color:var(--text-2);margin-top:1px;text-transform:uppercase;letter-spacing:.5px}
 .kcol-count{background:#fff;color:var(--text-2);font-size:10px;font-weight:500;padding:2px 7px;border-radius:10px;border:0.5px solid #d4d4d0}
 .kcol-body{padding:8px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:7px;min-height:80px}
 .kcol-body.dragover{background:#dfe9f5;border-radius:8px}
-.kcol.waitlist{background:#e8eef5;min-width:260px;max-width:260px}
-.kcol.waitlist .kcol-hdr{background:#dfe9f5}
-.kcol.waitlist .kcol-name{color:var(--blue-d)}
-.kcard{background:#fff;border:0.5px solid #d4d4d0;border-radius:8px;padding:9px 11px;cursor:grab;font-size:12px;box-shadow:0 1px 2px rgba(0,0,0,.03);transition:box-shadow .15s,transform .15s}
+.kcard{background:#fff;border:0.5px solid #d4d4d0;border-radius:8px;padding:9px 11px;cursor:grab;font-size:12px;box-shadow:0 1px 2px rgba(0,0,0,.03);transition:box-shadow .15s}
 .kcard:hover{box-shadow:0 2px 6px rgba(0,0,0,.08)}
 .kcard:active{cursor:grabbing}
-.kcard.dragging{opacity:.4;transform:rotate(2deg)}
+.kcard.dragging{opacity:.4}
 .kcard-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;gap:6px}
 .kcard-turno{background:#f5f5f3;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:500;color:var(--text-2);border:0.5px solid #d4d4d0}
 .kcard-name{font-weight:500;font-size:12px;line-height:1.3;margin-bottom:3px}
@@ -99,16 +93,19 @@ tr:hover td{background:var(--bg)}
 .kcard-meta{display:flex;gap:5px;flex-wrap:wrap;font-size:10px;margin-bottom:5px}
 .kcard-meta span{display:inline-block;padding:1px 6px;border-radius:4px;background:#f5f5f3;color:var(--text-2)}
 .kcard-bot{display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-top:6px;border-top:0.5px solid #ecece8}
-.kcard.urgent{border-left:3px solid #C74545}
 .kcard.programar{border-left:3px solid #E4A845}
 .kcard.tabla{border-left:3px solid #639922}
 .kcard.operado{border-left:3px solid #5B7BBA;background:linear-gradient(0deg,rgba(232,240,253,0.4),transparent)}
 .op-stamp{display:inline-flex;align-items:center;gap:4px;background:#e8f0fd;color:var(--blue-d);font-size:10px;font-weight:500;padding:2px 7px;border-radius:4px;border:0.5px solid #aecbfa}
-.op-stamp::before{content:"✓";font-weight:bold;font-size:11px}
+.op-stamp::before{content:"✓";font-weight:bold}
 .kcard-empty-zone{text-align:center;color:var(--text-3);font-size:11px;padding:18px 10px;border:1.5px dashed #d4d4d0;border-radius:8px;margin:4px}
-.history-badge{display:inline-flex;align-items:center;gap:5px;background:var(--amber-l);color:var(--amber-d);font-size:11px;padding:4px 9px;border-radius:20px;font-weight:500;cursor:pointer}
-.history-badge:hover{background:#F5DDB1}
-/* MODAL */
+/* MONTH TABS */
+.month-tabs{display:flex;gap:0;background:var(--surface);border-bottom:0.5px solid var(--border);padding:0 16px;flex-shrink:0}
+.month-tab{padding:9px 16px;font-size:12px;color:var(--text-2);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
+.month-tab:hover{color:var(--text);background:var(--bg)}
+.month-tab.active{color:var(--blue-d);font-weight:500;border-bottom-color:var(--blue)}
+.kb-toolbar{padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;flex-shrink:0;background:var(--surface);border-bottom:0.5px solid var(--border)}
+/* MODALS */
 .mbg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:200;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto}
 .mbg.open{display:flex}
 .modal{background:var(--surface);border-radius:var(--rl);border:0.5px solid var(--border);width:560px;max-width:100%;margin-bottom:40px}
@@ -126,6 +123,12 @@ tr:hover td{background:var(--bg)}
 .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:var(--bg);padding:11px;border-radius:6px;margin-bottom:14px;font-size:12px;border:0.5px solid var(--border)}
 .info-grid div{padding:2px 0}
 .info-grid strong{display:block;font-size:10px;color:var(--text-2);font-weight:500;margin-bottom:1px}
+/* UPLOAD */
+.uz{border:1.5px dashed var(--border-mid);border-radius:var(--r);padding:14px;text-align:center;cursor:pointer}
+.uz:hover{background:var(--bg)}
+.uz p{font-size:12px;color:var(--text-2);margin-top:4px}
+.prev-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.prev-row img{width:56px;height:56px;object-fit:cover;border-radius:6px;border:0.5px solid var(--border);cursor:pointer}
 /* DRAWER */
 .drawer-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:150}
 .drawer-bg.open{display:block}
@@ -135,7 +138,6 @@ tr:hover td{background:var(--bg)}
 .drawer-bd{flex:1;overflow-y:auto;padding:14px}
 .log-item{padding:10px 11px;border-radius:8px;background:var(--bg);margin-bottom:8px;font-size:11.5px;line-height:1.5}
 .log-time{font-size:10px;color:var(--text-3);margin-bottom:3px}
-/* MISC */
 .empty-s{text-align:center;padding:36px 20px;color:var(--text-2);font-size:13px}
 .spin{display:inline-block;width:14px;height:14px;border:2px solid var(--border-mid);border-top-color:var(--blue);border-radius:50%;animation:sp .7s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
@@ -152,19 +154,20 @@ tr:hover td{background:var(--bg)}
 .cfg-sec{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--rl);margin-bottom:14px;overflow:hidden}
 .cfg-hd{padding:11px 16px;border-bottom:0.5px solid var(--border);font-size:13px;font-weight:500;background:var(--bg)}
 .cfg-bd{padding:16px}
-@media(max-width:768px){.sidebar{display:none}.stats-row{grid-template-columns:repeat(2,1fr)}}
+/* IMG VIEWER */
+#viewer{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:300;align-items:center;justify-content:center}
+#viewer.open{display:flex}
+#viewer img{max-width:90vw;max-height:90vh;border-radius:8px}
+#viewer .vc{position:fixed;top:20px;right:24px;background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:50%;width:36px;height:36px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+@media(max-width:768px){.sidebar{display:none}.stats-row{grid-template-columns:repeat(2,1fr)}.kb-fixed{width:220px;min-width:220px}}
 </style>
 </head>
 <body>
 
+<!-- AUTH -->
 <div id="auth-screen">
   <div class="auth-card">
-    <div style="margin-bottom:18px">
-      <svg width="40" height="40" viewBox="0 0 40 40" fill="none" style="margin:0 auto;display:block">
-        <rect width="40" height="40" rx="10" fill="#E6F1FB"/>
-        <path d="M10 28l4-8 4 5 4-10 4 11" stroke="#185FA5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </div>
+    <div style="margin-bottom:18px"><svg width="40" height="40" viewBox="0 0 40 40" fill="none" style="margin:0 auto;display:block"><rect width="40" height="40" rx="10" fill="#E6F1FB"/><path d="M10 28l4-8 4 5 4-10 4 11" stroke="#185FA5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
     <h1>Tabla Quirúrgica</h1>
     <p>Unidad de Mano<br>Accede con tu cuenta Google del equipo</p>
     <button class="btn-google" onclick="signIn()">
@@ -174,6 +177,7 @@ tr:hover td{background:var(--bg)}
   </div>
 </div>
 
+<!-- APP -->
 <div id="app">
   <div class="layout">
     <aside class="sidebar">
@@ -184,35 +188,28 @@ tr:hover td{background:var(--bg)}
       <nav style="padding:10px 6px;flex:1">
         <div class="nav-section">Urgencia</div>
         <div class="nav-item active" data-view="lista" onclick="navTo(this)">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
           Lista de espera
         </div>
         <div class="nav-section">Pabellón</div>
         <div class="nav-item" data-view="kanban" onclick="navTo(this)">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="6" height="18" rx="1"/><rect x="11" y="3" width="6" height="13" rx="1"/></svg>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="6" height="18" rx="1"/><rect x="11" y="3" width="6" height="13" rx="1"/></svg>
           Tablero kanban
         </div>
         <div class="nav-section">Sistema</div>
         <div class="nav-item" data-view="config" onclick="navTo(this)">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
           Configuración
         </div>
       </nav>
-      <div class="sidebar-user">
-        <div class="uchip" onclick="signOut()">
-          <div class="avatar" id="user-avatar"><span id="user-initials">?</span></div>
-          <div><div class="uname" id="user-name">Cargando...</div><div class="urole">Cerrar sesión</div></div>
-        </div>
-      </div>
+      <div class="sidebar-user"><div class="uchip" onclick="signOut()"><div class="avatar" id="user-avatar"><span id="user-initials">?</span></div><div><div class="uname" id="user-name">Cargando...</div><div class="urole">Cerrar sesión</div></div></div></div>
     </aside>
-
     <div class="main">
       <div class="topbar">
         <span class="topbar-title" id="view-title">Lista de espera</span>
         <div style="display:flex;gap:7px;align-items:center" id="topbar-actions"></div>
       </div>
       <div class="content" id="content-container">
-
         <!-- LISTA DE ESPERA -->
         <div id="view-lista" class="vp">
           <div id="sb-lista" class="sbar load"><span class="dot a"></span><span>Cargando datos...</span><span class="spin" style="margin-left:auto"></span></div>
@@ -223,97 +220,111 @@ tr:hover td{background:var(--bg)}
             <div class="stat-card"><div class="stat-label">Alta prioridad</div><div class="stat-val" style="color:var(--red-d)" id="s-alta">—</div></div>
           </div>
           <div style="display:flex;gap:8px;margin-bottom:12px">
-            <input type="text" id="search-lista" placeholder="Buscar por nombre, RUT, diagnóstico..." oninput="renderLista()" style="flex:1;font-size:13px;padding:8px 12px;border-radius:var(--r);border:0.5px solid var(--border-mid);background:var(--surface);color:var(--text)" />
+            <input type="text" id="search-lista" placeholder="Buscar por nombre, RUT, diagnóstico..." oninput="renderLista()" style="flex:1;font-size:13px;padding:8px 12px;border-radius:var(--r);border:0.5px solid var(--border-mid);background:var(--surface);color:var(--text)"/>
+            <button class="btn btn-p" onclick="openM('modal-nuevo-pac')">+ Nuevo paciente</button>
           </div>
           <div class="card">
             <div class="card-head">
               <span class="cht">Pacientes — DIFERIDOS</span>
               <div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap">
                 <select id="fil-estado" onchange="renderLista()" style="font-size:12px;padding:5px 8px;border-radius:var(--r);border:0.5px solid var(--border-mid);background:var(--surface);color:var(--text)">
-                  <option value="PROGRAMAR">Solo PROGRAMAR</option>
-                  <option value="EN TABLA">Solo EN TABLA</option>
-                  <option value="OPERADO">Solo OPERADO</option>
-                  <option value="ACTIVOS">PROGRAMAR + EN TABLA</option>
+                  <option value="PROGRAMAR">PROGRAMAR</option><option value="EN TABLA">EN TABLA</option><option value="OPERADO">OPERADO</option><option value="ACTIVOS">PROGRAMAR + EN TABLA</option>
                 </select>
                 <select id="fil-prio" onchange="renderLista()" style="font-size:12px;padding:5px 8px;border-radius:var(--r);border:0.5px solid var(--border-mid);background:var(--surface);color:var(--text)">
-                  <option value="">Todas las prioridades</option>
-                  <option value="ALTA">Solo ALTA</option>
-                  <option value="MEDIA">Solo MEDIA</option>
-                  <option value="BAJA">Solo BAJA</option>
+                  <option value="">Todas prioridades</option><option value="ALTA">ALTA</option><option value="MEDIA">MEDIA</option><option value="BAJA">BAJA</option>
                 </select>
                 <select id="sort-lista" onchange="renderLista()" style="font-size:12px;padding:5px 8px;border-radius:var(--r);border:0.5px solid var(--border-mid);background:var(--surface);color:var(--text)">
-                  <option value="prio">Ordenar: Prioridad + días</option>
-                  <option value="nombre">Ordenar: Nombre A→Z</option>
-                  <option value="nombre-desc">Ordenar: Nombre Z→A</option>
-                  <option value="rut">Ordenar: RUT</option>
-                  <option value="edad">Ordenar: Edad ↑</option>
-                  <option value="edad-desc">Ordenar: Edad ↓</option>
-                  <option value="dias">Ordenar: Días desde lesión ↑</option>
-                  <option value="dias-desc">Ordenar: Días desde lesión ↓</option>
+                  <option value="prio">Prioridad + días</option><option value="nombre">Nombre A→Z</option><option value="nombre-desc">Nombre Z→A</option><option value="rut">RUT</option><option value="edad">Edad ↑</option><option value="edad-desc">Edad ↓</option><option value="dias-desc">Días ↓</option><option value="dias">Días ↑</option>
                 </select>
                 <button class="btn" onclick="loadDiferidos()">Actualizar</button>
               </div>
             </div>
             <div class="tw">
               <table>
-                <thead><tr>
-                  <th>Nombre</th><th>RUT</th><th>Edad</th><th>Diagnóstico</th><th>Lat.</th>
-                  <th>Prioridad</th><th>F. lesión</th><th>Días</th><th>Estado</th><th>Teléfono</th><th></th>
-                </tr></thead>
+                <thead><tr><th>Nombre</th><th>RUT</th><th>Edad</th><th>Diagnóstico</th><th>Lat.</th><th>Prioridad</th><th>F. lesión</th><th>Días</th><th>Estado</th><th>Teléfono</th><th></th></tr></thead>
                 <tbody id="lista-tb"><tr><td colspan="11" class="empty-s">Cargando...</td></tr></tbody>
               </table>
             </div>
           </div>
         </div>
-
         <!-- KANBAN -->
         <div id="view-kanban" class="vp" style="display:none;height:100%;flex-direction:column">
-          <div id="sb-kanban" class="sbar load"><span class="dot a"></span><span>Cargando tablero...</span><span class="spin" style="margin-left:auto"></span></div>
-          <div class="board-toolbar">
-            <div style="display:flex;align-items:center;gap:7px">
-              <button class="btn" onclick="loadKanban()">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
-                Sincronizar
-              </button>
-              <span class="history-badge" onclick="openDrawer()">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                Historial
-              </span>
+          <div class="month-tabs" id="month-tabs"></div>
+          <div class="kb-toolbar">
+            <div style="display:flex;gap:7px;align-items:center">
+              <button class="btn" onclick="loadKanban()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg> Sincronizar</button>
+              <span class="badge" onclick="openDrawer()" style="cursor:pointer;background:var(--amber-l);color:var(--amber-d)">Historial</span>
+            </div>
+            <div style="display:flex;gap:7px;align-items:center">
+              <button class="btn" onclick="openM('modal-nuevo-pac')">+ Paciente</button>
+              <button class="btn btn-p" onclick="addPabellon()">+ Pabellón</button>
             </div>
           </div>
-          <div class="board" id="board"></div>
+          <div id="sb-kanban" class="sbar load" style="margin:10px 16px"><span class="dot a"></span><span>Cargando tablero...</span><span class="spin" style="margin-left:auto"></span></div>
+          <div class="kb-wrapper" id="kb-wrapper"></div>
         </div>
-
         <!-- CONFIG -->
         <div id="view-config" class="vp" style="display:none">
           <div style="max-width:480px">
-            <div class="cfg-sec">
-              <div class="cfg-hd">Google Sheets — Lista de espera (DIFERIDOS)</div>
-              <div class="cfg-bd">
-                <div class="fg"><label>ID de la hoja</label><input type="text" id="cfg-sid" value="1V48vqYerSrQ2IC6hikePzMoCAASBZfzR3n_i9OvWjgI"/></div>
-                <div class="fg"><label>Nombre de la pestaña</label><input type="text" id="cfg-stab" value="DIFERIDOS"/></div>
-              </div>
-            </div>
-            <div class="cfg-sec">
-              <div class="cfg-hd">Google Sheets — Tabla quirúrgica</div>
-              <div class="cfg-bd">
-                <div class="fg"><label>ID de la hoja</label><input type="text" id="cfg-tid" value="1DBjeYGeLSSRG68CljiswtZoo_f5oG6wSTFoVaLbfqYE"/></div>
-                <div class="fg"><label>Nombre de la pestaña</label><input type="text" id="cfg-ttab" value="Junio 2026"/></div>
-              </div>
-            </div>
-            <div class="cfg-sec">
-              <div class="cfg-hd">OAuth — Client ID de Google Cloud</div>
-              <div class="cfg-bd">
-                <div class="fg"><label>Client ID</label><input type="text" id="cfg-cid" placeholder="XXXX-xxxx.apps.googleusercontent.com"/></div>
-                <p style="font-size:11px;color:var(--text-2);line-height:1.6">Consulta <strong>SETUP.md</strong> para instrucciones.</p>
-              </div>
-            </div>
+            <div class="cfg-sec"><div class="cfg-hd">DIFERIDOS</div><div class="cfg-bd"><div class="fg"><label>ID de la hoja</label><input type="text" id="cfg-sid" value="1V48vqYerSrQ2IC6hikePzMoCAASBZfzR3n_i9OvWjgI"/></div><div class="fg"><label>Pestaña</label><input type="text" id="cfg-stab" value="DIFERIDOS"/></div></div></div>
+            <div class="cfg-sec"><div class="cfg-hd">Tabla quirúrgica</div><div class="cfg-bd"><div class="fg"><label>ID de la hoja</label><input type="text" id="cfg-tid" value="1DBjeYGeLSSRG68CljiswtZoo_f5oG6wSTFoVaLbfqYE"/></div><div class="fg"><label>Pestaña activa</label><input type="text" id="cfg-ttab" value="Junio 2026"/></div></div></div>
+            <div class="cfg-sec"><div class="cfg-hd">OAuth</div><div class="cfg-bd"><div class="fg"><label>Client ID</label><input type="text" id="cfg-cid"/></div></div></div>
             <button class="btn btn-p" onclick="saveConfig()">Guardar configuración</button>
           </div>
         </div>
-
       </div>
     </div>
+  </div>
+</div>
+
+<!-- MODAL: Nuevo paciente -->
+<div class="mbg" id="modal-nuevo-pac">
+  <div class="modal">
+    <div class="mhd"><h2>Nuevo paciente</h2><button class="bti" onclick="closeM('modal-nuevo-pac')">✕</button></div>
+    <div class="mbd">
+      <div class="fg2">
+        <div class="fg" style="grid-column:1/-1"><label>Nombre completo *</label><input type="text" id="np-nom" placeholder="APELLIDO NOMBRE"/></div>
+        <div class="fg"><label>RUT *</label><input type="text" id="np-rut" placeholder="12.345.678-9"/></div>
+        <div class="fg"><label>Edad *</label><input type="number" id="np-edad" min="0" max="120"/></div>
+        <div class="fg" style="grid-column:1/-1"><label>Diagnóstico *</label><input type="text" id="np-dx"/></div>
+        <div class="fg"><label>Lateralidad *</label><select id="np-lat"><option value="Derecho">Derecho</option><option value="Izquierdo">Izquierdo</option><option value="Bilateral">Bilateral</option></select></div>
+        <div class="fg"><label>Prioridad</label><select id="np-prio"><option value="MEDIA">MEDIA</option><option value="ALTA">ALTA</option><option value="BAJA">BAJA</option></select></div>
+        <div class="fg"><label>Fecha accidente *</label><input type="date" id="np-facc"/></div>
+        <div class="fg"><label>Teléfono</label><input type="text" id="np-tel" placeholder="+56 9 XXXX XXXX"/></div>
+        <div class="fg" style="grid-column:1/-1"><label>Comentarios</label><textarea id="np-com" placeholder="Observaciones..."></textarea></div>
+      </div>
+      <div class="ssep">Radiografías</div>
+      <div class="uz" onclick="document.getElementById('fi-np').click()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/></svg>
+        <p>Subir radiografías (JPG, PNG)</p>
+      </div>
+      <input type="file" id="fi-np" multiple accept="image/*" style="display:none" onchange="prevF(event,'pv-np','img-np')"/>
+      <div class="prev-row" id="pv-np"></div>
+      <input type="hidden" id="img-np" value=""/>
+    </div>
+    <div class="mft"><button class="btn" onclick="closeM('modal-nuevo-pac')">Cancelar</button><button class="btn btn-p" onclick="guardarNuevoPac()">Guardar paciente</button></div>
+  </div>
+</div>
+
+<!-- MODAL: Programar (cuando arrastra a pabellon) -->
+<div class="mbg" id="modal-programar">
+  <div class="modal">
+    <div class="mhd"><h2 id="prog-title">Programar cirugía</h2><button class="bti" onclick="closeM('modal-programar');cancelSchedule()">✕</button></div>
+    <div class="mbd">
+      <div class="info-grid" id="prog-info"></div>
+      <div class="fg2">
+        <div class="fg" style="grid-column:1/-1"><label>Cirugía (CX) *</label><input type="text" id="prog-cx" placeholder="Ej: Red y OTS, Artrodesis MCF..."/></div>
+        <div class="fg"><label>Tiempo CX (min) *</label><input type="number" id="prog-tiempo" placeholder="90"/></div>
+        <div class="fg"><label>Anestesia *</label><select id="prog-an"><option>Regional</option><option>General</option><option>Local + sedación</option><option>Local</option><option>TIVA</option></select></div>
+        <div class="fg" style="grid-column:1/-1"><label>Cirujanos *</label><input type="text" id="prog-cir" placeholder="Ej: García / Rojas"/></div>
+        <div class="fg" style="grid-column:1/-1"><label>Insumos *</label><textarea id="prog-ins" placeholder="Implantes, materiales especiales..."></textarea></div>
+        <div class="fg"><label>Código</label><input type="text" id="prog-cod"/></div>
+        <div class="fg"><label>Biopsia</label><select id="prog-bio"><option>No</option><option>Sí</option></select></div>
+        <div class="fg"><label>Procedencia</label><select id="prog-proc"><option>AMB</option><option>HOSP</option><option>URG</option></select></div>
+        <div class="fg" style="grid-column:1/-1"><label>Comentario</label><textarea id="prog-com"></textarea></div>
+      </div>
+    </div>
+    <div class="mft"><button class="btn" onclick="closeM('modal-programar');cancelSchedule()">Cancelar</button><button class="btn btn-s" onclick="confirmarProgramar()">Confirmar y agendar</button></div>
   </div>
 </div>
 
@@ -324,19 +335,13 @@ tr:hover td{background:var(--bg)}
     <div class="mbd">
       <div class="info-grid" id="op-info"></div>
       <div class="fg"><label>Fecha de operación *</label><input type="date" id="op-fecha"/></div>
-      <div class="fg"><label>Comentarios post-operatorios</label><textarea id="op-com" placeholder="Hallazgos, complicaciones..."></textarea></div>
-      <p style="font-size:11px;color:var(--text-2);background:var(--bg);padding:9px 11px;border-radius:6px;line-height:1.5">
-        Al confirmar se actualizará la columna B (AL=OPERADO) y la columna L (FECHA CX) en DIFERIDOS, y se marcará el comentario en la tabla quirúrgica.
-      </p>
+      <div class="fg"><label>Comentarios post-op</label><textarea id="op-com" placeholder="Hallazgos, complicaciones..."></textarea></div>
     </div>
-    <div class="mft">
-      <button class="btn" onclick="closeM('modal-operado')">Cancelar</button>
-      <button class="btn btn-s" onclick="confirmarOperado()">Confirmar operación</button>
-    </div>
+    <div class="mft"><button class="btn" onclick="closeM('modal-operado')">Cancelar</button><button class="btn btn-s" onclick="confirmarOperado()">Confirmar operación</button></div>
   </div>
 </div>
 
-<!-- MODAL: Edit Card (and add to tabla) -->
+<!-- MODAL: Edit card -->
 <div class="mbg" id="modal-card">
   <div class="modal">
     <div class="mhd"><h2 id="cm-title">Editar tarjeta</h2><button class="bti" onclick="closeM('modal-card')">✕</button></div>
@@ -344,8 +349,8 @@ tr:hover td{background:var(--bg)}
       <div class="info-grid" id="cm-info"></div>
       <div class="fg2">
         <div class="fg"><label>HORA</label><input type="text" id="cm-hora"/></div>
-        <div class="fg"><label>TIEMPO CX (min)</label><input type="text" id="cm-tiempo"/></div>
-        <div class="fg" style="grid-column:1/-1"><label>CX (procedimiento)</label><input type="text" id="cm-cx"/></div>
+        <div class="fg"><label>TIEMPO CX</label><input type="text" id="cm-tiempo"/></div>
+        <div class="fg" style="grid-column:1/-1"><label>CX</label><input type="text" id="cm-cx"/></div>
         <div class="fg" style="grid-column:1/-1"><label>CIRUJANOS</label><input type="text" id="cm-cirujanos"/></div>
         <div class="fg"><label>ANESTESIA</label><input type="text" id="cm-anestesia"/></div>
         <div class="fg"><label>CODIGO</label><input type="text" id="cm-codigo"/></div>
@@ -355,23 +360,18 @@ tr:hover td{background:var(--bg)}
         <div class="fg" style="grid-column:1/-1"><label>COMENTARIO</label><textarea id="cm-comentario"></textarea></div>
       </div>
     </div>
-    <div class="mft">
-      <button class="btn" onclick="closeM('modal-card')">Cancelar</button>
-      <button class="btn btn-p" onclick="guardarTarjeta()">Guardar cambios</button>
-    </div>
+    <div class="mft"><button class="btn" onclick="closeM('modal-card')">Cancelar</button><button class="btn btn-p" onclick="guardarTarjeta()">Guardar</button></div>
   </div>
 </div>
 
-<!-- DRAWER: Historial -->
+<!-- IMG VIEWER -->
+<div id="viewer" onclick="this.classList.remove('open')"><button class="vc">✕</button><img id="viewer-img" src="" alt="RX"/></div>
+<!-- DRAWER -->
 <div class="drawer-bg" id="drawer-bg" onclick="closeDrawer()"></div>
 <div class="drawer" id="drawer">
-  <div class="drawer-hd">
-    <div><h2 style="font-size:14px;font-weight:500">Historial</h2><div style="font-size:11px;color:var(--text-2);margin-top:2px">Cambios recientes</div></div>
-    <button class="bti" onclick="closeDrawer()">✕</button>
-  </div>
+  <div class="drawer-hd"><div><h2 style="font-size:14px;font-weight:500">Historial</h2></div><button class="bti" onclick="closeDrawer()">✕</button></div>
   <div class="drawer-bd" id="log-list"></div>
 </div>
-
 <div id="toast"></div>
 
 <script>
@@ -379,39 +379,28 @@ tr:hover td{background:var(--bg)}
 const CFG={clientId:'177331338816-nkp1hdbv9uogmm228u0e8ada9ehmlb8m.apps.googleusercontent.com',sheetD:'1V48vqYerSrQ2IC6hikePzMoCAASBZfzR3n_i9OvWjgI',tabD:'DIFERIDOS',sheetT:'1DBjeYGeLSSRG68CljiswtZoo_f5oG6wSTFoVaLbfqYE',tabT:'Junio 2026'};
 const SCOPES='https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
 const DISC='https://sheets.googleapis.com/$discovery/rest?version=v4';
-
-// DIFERIDOS column mapping (real schema)
-const DCOL={AL:'B',DIAS:'C',RUT:'D',NOMBRE:'E',EDAD:'F',DX:'G',PRIO:'H',F_INGRESO:'I',F_ACC:'J',F_CX:'K',COM:'L',TEL:'M',LAT:'N'};
 const DCOL_IDX={AL:1,DIAS:2,RUT:3,NOMBRE:4,EDAD:5,DX:6,PRIO:7,F_INGRESO:8,F_ACC:9,F_CX:10,COM:11,TEL:12,LAT:13};
-
-// Tabla quirúrgica field row offsets within a 15-row slot (slot starts at row N: HORA=N, NOMBRE=N+1, ...)
+const DCOL={AL:'B',DIAS:'C',RUT:'D',NOMBRE:'E',EDAD:'F',DX:'G',PRIO:'H',F_INGRESO:'I',F_ACC:'J',F_CX:'K',COM:'L',TEL:'M',LAT:'N'};
 const FIELDS=['HORA','NOMBRE','RUT','EDAD','PROCEDENCIA','DG','LATERALIDAD','CX','CODIGO','TIEMPO_CX','ANESTESIA','CIRUJANOS','INSUMOS','BIOPSIA','COMENTARIO'];
-// slot height = 15 rows (FIELDS above) and starts at row 2 (HORA), then row 17, row 32, etc.
 const SLOT_HEIGHT=15;
+const MONTHS=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
 // ==================== STORAGE ====================
 const ls={get:k=>{try{return JSON.parse(localStorage.getItem(k)||'null')}catch(e){return null}},set:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 
-// ==================== UI HELPERS ====================
+// ==================== UI ====================
 function toast(msg,dur=3000){const el=document.getElementById('toast');el.innerHTML='<span class="sync-dot"></span>'+msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),dur);}
 function openM(id){document.getElementById(id).classList.add('open')}
 function closeM(id){document.getElementById(id).classList.remove('open')}
 document.querySelectorAll('.mbg').forEach(bg=>bg.addEventListener('click',e=>{if(e.target===bg)bg.classList.remove('open')}));
 function openDrawer(){document.getElementById('drawer').classList.add('open');document.getElementById('drawer-bg').classList.add('open');renderLog();}
 function closeDrawer(){document.getElementById('drawer').classList.remove('open');document.getElementById('drawer-bg').classList.remove('open');}
-
 function setSB(id,state,msg){const el=document.getElementById(id);if(!el)return;const dc=state==='ok'?'':state==='err'?'r':'a';const ld=state==='load'?'<span class="spin" style="margin-left:auto"></span>':'';el.className='sbar'+(state==='err'?' err':state==='load'?' load':'');el.innerHTML=`<span class="dot ${dc}"></span><span>${msg}</span>${ld}`;}
-
 function colLetter(n){let s='';while(n>=0){s=String.fromCharCode(65+n%26)+s;n=Math.floor(n/26)-1;}return s;}
-function fmtDateCL(d){return d.toLocaleDateString('es-CL');}
-function toDateInputVal(d){return d.toISOString().split('T')[0];}
+function fmtDateCL(isoStr){if(!isoStr)return '';const d=new Date(isoStr+'T12:00:00');return d.toLocaleDateString('es-CL');}
 
 // ==================== NAV ====================
-const topMap={
-  lista:{t:'Lista de espera (DIFERIDOS)',a:''},
-  kanban:{t:'Tablero quirúrgico',a:''},
-  config:{t:'Configuración',a:''}
-};
+const topMap={lista:{t:'Lista de espera (DIFERIDOS)',a:''},kanban:{t:'Tablero quirúrgico',a:''},config:{t:'Configuración',a:''}};
 function navTo(el){
   const v=el.dataset.view;
   document.querySelectorAll('.vp').forEach(p=>p.style.display='none');
@@ -420,128 +409,75 @@ function navTo(el){
   view.style.display=v==='kanban'?'flex':'block';
   el.classList.add('active');
   document.getElementById('view-title').textContent=topMap[v].t;
-  document.getElementById('topbar-actions').innerHTML=topMap[v].a;
   document.getElementById('content-container').className='content'+(v==='kanban'?' kanban':'');
-  if(v==='lista')loadDiferidos();
-  if(v==='kanban')loadKanban();
+  if(v==='lista')loadDiferidos();if(v==='kanban')loadKanban();
 }
 
 // ==================== GOOGLE AUTH ====================
 let accessToken=null,userEmail=null;
-
 function loadGAPI(){
   Object.assign(CFG,ls.get('appCFG')||{});
-  const cid=CFG.clientId;
-  if(!cid){showNoCID();return;}
-
-  // 1) Check if we're returning from Google OAuth redirect (token in URL hash)
+  if(!CFG.clientId){document.getElementById('auth-screen').innerHTML='<div class="auth-card"><h1>Configuración pendiente</h1><p>Falta el Client ID.</p></div>';return;}
   if(window.location.hash.includes('access_token')){
     const params=new URLSearchParams(window.location.hash.substring(1));
     const token=params.get('access_token');
-    const expiresIn=parseInt(params.get('expires_in')||'3600');
-    if(token){
-      ls.set('gtoken',{token:token,expires:Date.now()+(expiresIn-60)*1000});
-      history.replaceState(null,'',window.location.pathname);
-    }
+    if(token){ls.set('gtoken',{token,expires:Date.now()+(parseInt(params.get('expires_in')||3600)-60)*1000});history.replaceState(null,'',window.location.pathname);}
   }
-
-  // 2) Load Google API client (for Sheets)
   const s1=document.createElement('script');s1.src='https://apis.google.com/js/api.js';
   s1.onload=()=>gapi.load('client',async()=>{
     await gapi.client.init({discoveryDocs:[DISC]});
-    // 3) Check for saved token
     const saved=ls.get('gtoken');
-    if(saved&&saved.expires>Date.now()){
-      gapi.client.setToken({access_token:saved.token});
-      accessToken=saved.token;
-      fetchUser(saved.token);
-      showApp();
-    } else {
-      // Enable sign-in button
-      const btn=document.querySelector('.btn-google');
-      if(btn){btn.disabled=false;btn.style.opacity='1';btn.style.cursor='pointer';}
-    }
+    if(saved&&saved.expires>Date.now()){gapi.client.setToken({access_token:saved.token});accessToken=saved.token;fetchUser(saved.token);showApp();}
   });
   document.head.appendChild(s1);
 }
-function showNoCID(){
-  document.getElementById('auth-screen').innerHTML=`<div class="auth-card"><h1 style="font-size:16px;margin-bottom:12px">Configuración pendiente</h1><p>Falta configurar el Client ID. Abre SETUP.md para instrucciones.</p></div>`;
-}
 function signIn(){
-  if(!CFG.clientId){showNoCID();return;}
-  // Direct redirect to Google OAuth — no popup, no GIS library needed
-  const redirectUri=window.location.origin+window.location.pathname;
-  const authUrl='https://accounts.google.com/o/oauth2/v2/auth'
-    +'?client_id='+encodeURIComponent(CFG.clientId)
-    +'&redirect_uri='+encodeURIComponent(redirectUri)
-    +'&response_type=token'
-    +'&scope='+encodeURIComponent(SCOPES)
-    +'&prompt=select_account';
-  window.location.href=authUrl;
+  if(!CFG.clientId)return;
+  const redir=window.location.origin+window.location.pathname;
+  window.location.href='https://accounts.google.com/o/oauth2/v2/auth?client_id='+encodeURIComponent(CFG.clientId)+'&redirect_uri='+encodeURIComponent(redir)+'&response_type=token&scope='+encodeURIComponent(SCOPES)+'&prompt=select_account';
 }
-function fetchUser(token){
-  fetch('https://www.googleapis.com/oauth2/v2/userinfo',{headers:{Authorization:'Bearer '+token}}).then(r=>r.json()).then(u=>{
-    const n=u.name||u.email||'Usuario';userEmail=u.email;
-    const ini=n.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
-    document.getElementById('user-name').textContent=n;
-    document.getElementById('user-initials').textContent=ini;
-    if(u.picture)document.getElementById('user-avatar').innerHTML=`<img src="${u.picture}" alt=""/>`;
-  });
-}
+function fetchUser(token){fetch('https://www.googleapis.com/oauth2/v2/userinfo',{headers:{Authorization:'Bearer '+token}}).then(r=>r.json()).then(u=>{const n=u.name||u.email||'Usuario';userEmail=u.email;document.getElementById('user-name').textContent=n;document.getElementById('user-initials').textContent=n.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();if(u.picture)document.getElementById('user-avatar').innerHTML=`<img src="${u.picture}"/>`;});}
 function showApp(){document.getElementById('auth-screen').style.display='none';document.getElementById('app').style.display='block';loadDiferidos();}
 function signOut(){accessToken=null;ls.set('gtoken',null);location.reload();}
 
-// ==================== SHEETS HELPERS ====================
+// ==================== SHEETS ====================
 const sheetsGet=(id,range)=>gapi.client.sheets.spreadsheets.values.get({spreadsheetId:id,range}).then(r=>r.result.values||[]);
 const sheetsBatch=(id,data)=>gapi.client.sheets.spreadsheets.values.batchUpdate({spreadsheetId:id,resource:{valueInputOption:'USER_ENTERED',data}});
 const sheetsUpdate=(id,range,vals)=>gapi.client.sheets.spreadsheets.values.update({spreadsheetId:id,range,valueInputOption:'USER_ENTERED',resource:{values:vals}});
+const sheetsAppend=(id,range,vals)=>gapi.client.sheets.spreadsheets.values.append({spreadsheetId:id,range,valueInputOption:'USER_ENTERED',insertDataOption:'INSERT_ROWS',resource:{values:[vals]}});
 
 // ==================== DIFERIDOS ====================
 let diferidosData=[];
-
 async function loadDiferidos(){
   setSB('sb-lista','load','Cargando DIFERIDOS...');
   if(!accessToken){setSB('sb-lista','err','Sin sesión');return;}
   try{
-    const sid=CFG.sheetD,tab=CFG.tabD;
-    const rows=await sheetsGet(sid,`'${tab}'!A2:N500`);
-    diferidosData=rows.map((r,i)=>({
-      ri:i+2,
-      al:r[DCOL_IDX.AL]||'',
-      dias:r[DCOL_IDX.DIAS]||'',
-      rut:r[DCOL_IDX.RUT]||'',
-      nombre:r[DCOL_IDX.NOMBRE]||'',
-      edad:r[DCOL_IDX.EDAD]||'',
-      dx:r[DCOL_IDX.DX]||'',
-      prio:(r[DCOL_IDX.PRIO]||'').toString().trim().toUpperCase(),
-      f_ingreso:r[DCOL_IDX.F_INGRESO]||'',
-      f_acc:r[DCOL_IDX.F_ACC]||'',
-      f_cx:r[DCOL_IDX.F_CX]||'',
-      com:r[DCOL_IDX.COM]||'',
-      tel:r[DCOL_IDX.TEL]||'',
-      lat:r[DCOL_IDX.LAT]||''
-    })).filter(r=>r.nombre);
+    const rows=await sheetsGet(CFG.sheetD,`'${CFG.tabD}'!A2:N1000`);
+    diferidosData=rows.map((r,i)=>({ri:i+2,al:r[DCOL_IDX.AL]||'',dias:r[DCOL_IDX.DIAS]||'',rut:r[DCOL_IDX.RUT]||'',nombre:r[DCOL_IDX.NOMBRE]||'',edad:r[DCOL_IDX.EDAD]||'',dx:r[DCOL_IDX.DX]||'',prio:(r[DCOL_IDX.PRIO]||'').toString().trim().toUpperCase(),f_ingreso:r[DCOL_IDX.F_INGRESO]||'',f_acc:r[DCOL_IDX.F_ACC]||'',f_cx:r[DCOL_IDX.F_CX]||'',com:r[DCOL_IDX.COM]||'',tel:r[DCOL_IDX.TEL]||'',lat:r[DCOL_IDX.LAT]||''})).filter(r=>r.nombre);
     renderLista();updateStats();
     setSB('sb-lista','ok',`${diferidosData.length} pacientes · sync ${new Date().toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'})}`);
   }catch(e){setSB('sb-lista','err','Error: '+(e.message||e));}
 }
+function diasTag(d){const n=parseInt(d);if(isNaN(n))return '<span class="dtag" style="background:var(--bg);color:var(--text-2)">—</span>';if(n>30)return `<span class="dtag durg">${n}d</span>`;if(n>14)return `<span class="dtag dwarn">${n}d</span>`;return `<span class="dtag dok">${n}d</span>`;}
+function prioTag(p){if(!p)return '';const cls=p==='ALTA'?'prio-alta':p==='MEDIA'?'prio-media':'prio-baja';return `<span class="prio ${cls}">${p}</span>`;}
+function alBadge(al){if(al==='PROGRAMAR')return '<span class="badge b-wait">PROGRAMAR</span>';if(al==='EN TABLA')return '<span class="badge b-sched">EN TABLA</span>';if(al==='OPERADO')return '<span class="badge b-done">OPERADO</span>';return `<span class="badge" style="background:var(--bg);color:var(--text-2)">${al||'—'}</span>`;}
 
-function diasTag(d){
-  const n=parseInt(d);if(isNaN(n))return '<span class="dtag" style="background:var(--bg);color:var(--text-2)">—</span>';
-  if(n>30)return `<span class="dtag durg">${n}d</span>`;
-  if(n>14)return `<span class="dtag dwarn">${n}d</span>`;
-  return `<span class="dtag dok">${n}d</span>`;
+function sortRows(rows,sortBy){
+  return rows.sort((a,b)=>{
+    if(sortBy==='nombre')return (a.nombre||'').localeCompare(b.nombre||'');
+    if(sortBy==='nombre-desc')return (b.nombre||'').localeCompare(a.nombre||'');
+    if(sortBy==='rut')return (a.rut||'').localeCompare(b.rut||'');
+    if(sortBy==='edad')return (parseInt(a.edad)||0)-(parseInt(b.edad)||0);
+    if(sortBy==='edad-desc')return (parseInt(b.edad)||0)-(parseInt(a.edad)||0);
+    if(sortBy==='dias')return (parseInt(a.dias)||0)-(parseInt(b.dias)||0);
+    if(sortBy==='dias-desc')return (parseInt(b.dias)||0)-(parseInt(a.dias)||0);
+    const pA=a.prio==='ALTA'?0:a.prio==='MEDIA'?1:2;const pB=b.prio==='ALTA'?0:b.prio==='MEDIA'?1:2;
+    if(pA!==pB)return pA-pB;return (parseInt(b.dias)||0)-(parseInt(a.dias)||0);
+  });
 }
-function prioTag(p){
-  if(!p)return '';
-  const cls=p==='ALTA'?'prio-alta':p==='MEDIA'?'prio-media':'prio-baja';
-  return `<span class="prio ${cls}">${p}</span>`;
-}
-function alBadge(al){
-  if(al==='PROGRAMAR')return '<span class="badge b-wait">PROGRAMAR</span>';
-  if(al==='EN TABLA')return '<span class="badge b-sched">EN TABLA</span>';
-  if(al==='OPERADO')return '<span class="badge b-done">OPERADO</span>';
-  return `<span class="badge" style="background:var(--bg);color:var(--text-2)">${al||'—'}</span>`;
+function filterSearch(rows,q){
+  if(!q)return rows;
+  return rows.filter(r=>(r.nombre||'').toLowerCase().includes(q)||(r.rut||'').replace(/[.\-]/g,'').includes(q.replace(/[.\-]/g,''))||(r.dx||'').toLowerCase().includes(q)||(r.edad||'').toString().includes(q));
 }
 
 function renderLista(){
@@ -553,119 +489,131 @@ function renderLista(){
   if(fE==='ACTIVOS')rows=rows.filter(r=>r.al==='PROGRAMAR'||r.al==='EN TABLA');
   else if(fE)rows=rows.filter(r=>r.al===fE);
   if(fP)rows=rows.filter(r=>r.prio===fP);
-  if(searchQ){rows=rows.filter(r=>(r.nombre||'').toLowerCase().includes(searchQ)||(r.rut||'').replace(/[.\-]/g,'').includes(searchQ.replace(/[.\-]/g,''))||(r.dx||'').toLowerCase().includes(searchQ)||(r.edad||'').toString().includes(searchQ));}
+  rows=filterSearch(rows,searchQ);
   const tb=document.getElementById('lista-tb');
-  if(!rows.length){tb.innerHTML='<tr><td colspan="11" class="empty-s">No hay pacientes que coincidan.</td></tr>';return;}
-  // Sort
-  rows.sort((a,b)=>{
-    if(sortBy==='nombre')return (a.nombre||'').localeCompare(b.nombre||'');
-    if(sortBy==='nombre-desc')return (b.nombre||'').localeCompare(a.nombre||'');
-    if(sortBy==='rut')return (a.rut||'').localeCompare(b.rut||'');
-    if(sortBy==='edad')return (parseInt(a.edad)||0)-(parseInt(b.edad)||0);
-    if(sortBy==='edad-desc')return (parseInt(b.edad)||0)-(parseInt(a.edad)||0);
-    if(sortBy==='dias')return (parseInt(a.dias)||0)-(parseInt(b.dias)||0);
-    if(sortBy==='dias-desc')return (parseInt(b.dias)||0)-(parseInt(a.dias)||0);
-    // default: prio + dias desc
-    const pA=a.prio==='ALTA'?0:a.prio==='MEDIA'?1:2;const pB=b.prio==='ALTA'?0:b.prio==='MEDIA'?1:2;
-    if(pA!==pB)return pA-pB;return (parseInt(b.dias)||0)-(parseInt(a.dias)||0);
-  });
-  tb.innerHTML=rows.map(r=>`<tr>
-    <td><strong>${r.nombre}</strong></td>
-    <td style="white-space:nowrap">${r.rut}</td>
-    <td>${r.edad}</td>
-    <td>${r.dx}</td>
-    <td>${r.lat||'—'}</td>
-    <td>${prioTag(r.prio)}</td>
-    <td style="white-space:nowrap">${r.f_acc}</td>
-    <td>${diasTag(r.dias)}</td>
-    <td>${alBadge(r.al)}</td>
-    <td style="white-space:nowrap">${r.tel||'—'}</td>
-    <td><button class="bti" onclick="navToKanban()">→</button></td>
-  </tr>`).join('');
+  if(!rows.length){tb.innerHTML='<tr><td colspan="11" class="empty-s">Sin resultados.</td></tr>';return;}
+  sortRows(rows,sortBy);
+  tb.innerHTML=rows.map(r=>`<tr><td><strong>${r.nombre}</strong></td><td style="white-space:nowrap">${r.rut}</td><td>${r.edad}</td><td>${r.dx}</td><td>${r.lat||'—'}</td><td>${prioTag(r.prio)}</td><td style="white-space:nowrap">${r.f_acc}</td><td>${diasTag(r.dias)}</td><td>${alBadge(r.al)}</td><td style="white-space:nowrap">${r.tel||'—'}</td><td><button class="bti" onclick="navToKanban()">→</button></td></tr>`).join('');
 }
-
 function updateStats(){
   const prog=diferidosData.filter(r=>r.al==='PROGRAMAR').length;
   const tabla=diferidosData.filter(r=>r.al==='EN TABLA').length;
   const alta=diferidosData.filter(r=>(r.al==='PROGRAMAR'||r.al==='EN TABLA')&&r.prio==='ALTA').length;
-  const now=new Date(),thisMonth=now.getMonth(),thisYear=now.getFullYear();
-  const op=diferidosData.filter(r=>{if(r.al!=='OPERADO'||!r.f_cx)return false;const p=r.f_cx.split('/');if(p.length<3)return false;const d=new Date(parseInt(p[2]),parseInt(p[1])-1,parseInt(p[0]));return d.getMonth()===thisMonth&&d.getFullYear()===thisYear;}).length;
-  document.getElementById('s-total').textContent=prog;
-  document.getElementById('s-tabla').textContent=tabla;
-  document.getElementById('s-op').textContent=op;
-  document.getElementById('s-alta').textContent=alta;
+  const now=new Date(),m=now.getMonth(),y=now.getFullYear();
+  const op=diferidosData.filter(r=>{if(r.al!=='OPERADO'||!r.f_cx)return false;const p=r.f_cx.split('/');if(p.length<3)return false;const d=new Date(parseInt(p[2]),parseInt(p[1])-1,parseInt(p[0]));return d.getMonth()===m&&d.getFullYear()===y;}).length;
+  document.getElementById('s-total').textContent=prog;document.getElementById('s-tabla').textContent=tabla;document.getElementById('s-op').textContent=op;document.getElementById('s-alta').textContent=alta;
 }
 function navToKanban(){document.querySelector('[data-view="kanban"]').click();}
 
+// ==================== NUEVO PACIENTE ====================
+async function guardarNuevoPac(){
+  const nom=document.getElementById('np-nom').value.trim();
+  const rut=document.getElementById('np-rut').value.trim();
+  const edad=document.getElementById('np-edad').value;
+  const dx=document.getElementById('np-dx').value.trim();
+  const facc=document.getElementById('np-facc').value;
+  if(!nom||!rut||!dx||!facc||!edad){toast('Completa los campos obligatorios (*)');return;}
+  const faccFmt=fmtDateCL(facc);
+  const today=new Date().toLocaleDateString('es-CL');
+  // Row: A(empty for formula) B=PROGRAMAR C=formula D=RUT E=NOMBRE F=EDAD G=DX H=PRIO I=F_INGRESO J=F_ACC K=F_CX L=COM M=TEL N=LAT
+  const row=['','PROGRAMAR','',rut,nom,edad,dx,document.getElementById('np-prio').value,today,faccFmt,'',document.getElementById('np-com').value,document.getElementById('np-tel').value,document.getElementById('np-lat').value];
+  try{
+    await sheetsAppend(CFG.sheetD,`'${CFG.tabD}'!A:N`,row);
+    // Save images locally
+    const imgs=document.getElementById('img-np').value;
+    if(imgs){const s=ls.get('imgs_e')||{};s[rut]=(s[rut]||[]).concat(JSON.parse(imgs));ls.set('imgs_e',s);}
+    toast('Paciente registrado en DIFERIDOS ✓');
+    closeM('modal-nuevo-pac');
+    ['np-nom','np-rut','np-edad','np-dx','np-facc','np-tel','np-com'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('pv-np').innerHTML='';document.getElementById('img-np').value='';
+    await loadDiferidos();
+  }catch(e){toast('Error: '+(e.message||e));}
+}
+
+// ==================== IMAGES ====================
+function prevF(ev,prvId,hidId){
+  const row=document.getElementById(prvId);
+  const ex=document.getElementById(hidId).value?JSON.parse(document.getElementById(hidId).value):[];
+  Array.from(ev.target.files).forEach(f=>{const rd=new FileReader();rd.onload=e=>{const b64=e.target.result;ex.push(b64);document.getElementById(hidId).value=JSON.stringify(ex);const img=document.createElement('img');img.src=b64;img.onclick=()=>{document.getElementById('viewer-img').src=b64;document.getElementById('viewer').classList.add('open');};row.appendChild(img);};rd.readAsDataURL(f);});
+}
+
+// ==================== MONTH TABS ====================
+function renderMonthTabs(){
+  const now=new Date();const curMonth=now.getMonth();const curYear=now.getFullYear();
+  const tabs=document.getElementById('month-tabs');
+  let html='';
+  for(let i=-1;i<=6;i++){
+    const m=(curMonth+i+12)%12;const y=curYear+Math.floor((curMonth+i)/12);
+    const label=`${MONTHS[m]} ${y}`;
+    const tabName=`${MONTHS[m]} ${y}`;
+    const isActive=CFG.tabT===tabName;
+    html+=`<div class="month-tab ${isActive?'active':''}" onclick="switchMonth('${tabName}')">${label}</div>`;
+  }
+  tabs.innerHTML=html;
+}
+function switchMonth(tabName){
+  CFG.tabT=tabName;
+  document.getElementById('cfg-ttab').value=tabName;
+  ls.set('appCFG',CFG);
+  renderMonthTabs();
+  loadKanban();
+}
+
 // ==================== KANBAN ====================
-// Data model: kanbanCols = [{header, colIdx, slots:[{slotIdx, rowStart, fields:{HORA,NOMBRE,...}}]}]
-let kanbanCols=[];
+let kanbanCols=[],dragSrc=null,pendingSchedule=null;
 
 async function loadKanban(){
+  renderMonthTabs();
   setSB('sb-kanban','load','Cargando tablero...');
   if(!accessToken){setSB('sb-kanban','err','Sin sesión');return;}
   if(!diferidosData.length)await loadDiferidos();
   try{
-    const sid=CFG.sheetT,tab=CFG.tabT;
-    // Read all of A1:AZ200 (covers ~10 slots per column, plenty)
-    const rows=await sheetsGet(sid,`'${tab}'!A1:AZ200`);
-    // Row 1 = column headers (pabellón-day names)
+    const rows=await sheetsGet(CFG.sheetT,`'${CFG.tabT}'!A1:AZ200`);
     const headers=rows[0]||[];
     kanbanCols=[];
     headers.forEach((h,colIdx)=>{
-      if(!h||!h.trim()||colIdx===0)return; // skip col A (labels) and empty headers
-      // For each slot starting at row 2, every 15 rows
-      const slots=[];
-      let slotIdx=0;
+      if(!h||!h.trim()||colIdx===0)return;
+      const slots=[];let slotIdx=0;
       for(let slotStart=1;slotStart+SLOT_HEIGHT-1<rows.length;slotStart+=SLOT_HEIGHT){
         const fields={};
-        for(let f=0;f<FIELDS.length;f++){
-          const row=rows[slotStart+f];
-          fields[FIELDS[f]]=row?(row[colIdx]||''):'';
-        }
-        // Only include slot if it has a NOMBRE
-        if(fields.NOMBRE&&fields.NOMBRE.trim()){
-          slots.push({slotIdx,rowStart:slotStart+1,fields});
-        }
+        for(let f=0;f<FIELDS.length;f++){const row=rows[slotStart+f];fields[FIELDS[f]]=row?(row[colIdx]||''):'';}
+        if(fields.NOMBRE&&fields.NOMBRE.trim())slots.push({slotIdx,rowStart:slotStart+1,fields});
         slotIdx++;
       }
       kanbanCols.push({header:h.trim(),colIdx,colLetter:colLetter(colIdx),slots});
     });
     renderBoard();
-    setSB('sb-kanban','ok',`${kanbanCols.length} pabellones-día · ${kanbanCols.reduce((s,c)=>s+c.slots.length,0)} cirugías`);
+    setSB('sb-kanban','ok',`${kanbanCols.length} pabellones · ${kanbanCols.reduce((s,c)=>s+c.slots.length,0)} cirugías`);
   }catch(e){setSB('sb-kanban','err','Error: '+(e.message||e));}
 }
 
 function renderBoard(){
-  const board=document.getElementById('board');
-  let html='';
-  // First col: waitlist with search/filter/sort controls
+  const wrapper=document.getElementById('kb-wrapper');
   const wlCount=diferidosData.filter(r=>r.al==='PROGRAMAR').length;
-  html+=`<div class="kcol waitlist">
-    <div class="kcol-hdr"><div><div class="kcol-name">Lista de espera</div><div class="kcol-day">PROGRAMAR · ${wlCount}</div></div></div>
-    <div style="padding:6px 8px 2px;display:flex;flex-direction:column;gap:5px">
-      <input type="text" id="kb-search" placeholder="Buscar nombre o RUT..." oninput="renderWaitlist()" style="font-size:11px;padding:5px 8px;border-radius:6px;border:0.5px solid #c8c8c2;width:100%" />
+  // Fixed left panel
+  let fixedHtml=`<div class="kb-fixed">
+    <div class="kb-fixed-hdr"><div class="kb-fixed-name">Lista de espera · ${wlCount}</div></div>
+    <div class="kb-fixed-controls">
+      <input type="text" id="kb-search" placeholder="Buscar nombre o RUT..." oninput="renderWaitlist()"/>
       <div style="display:flex;gap:4px">
-        <select id="kb-prio" onchange="renderWaitlist()" style="font-size:10px;padding:3px 5px;border-radius:5px;border:0.5px solid #c8c8c2;flex:1">
-          <option value="">Todas</option><option value="ALTA">Alta</option><option value="MEDIA">Media</option><option value="BAJA">Baja</option>
-        </select>
-        <select id="kb-sort" onchange="renderWaitlist()" style="font-size:10px;padding:3px 5px;border-radius:5px;border:0.5px solid #c8c8c2;flex:1">
-          <option value="prio">Prioridad</option><option value="dias-desc">Más antiguos</option><option value="dias">Más recientes</option><option value="nombre">Nombre A→Z</option>
-        </select>
+        <select id="kb-prio" onchange="renderWaitlist()" style="flex:1"><option value="">Todas</option><option value="ALTA">Alta</option><option value="MEDIA">Media</option><option value="BAJA">Baja</option></select>
+        <select id="kb-sort" onchange="renderWaitlist()" style="flex:1"><option value="prio">Prioridad</option><option value="dias-desc">Más antiguos</option><option value="dias">Más recientes</option><option value="nombre">Nombre</option></select>
       </div>
     </div>
-    <div class="kcol-body" data-drop="waitlist" id="kb-waitlist-body"></div>
+    <div class="kb-fixed-body" data-drop="waitlist" id="kb-waitlist-body"></div>
   </div>`;
-  // Kanban columns
+  // Scrollable columns
+  let scrollHtml='<div class="kb-scroll" id="kb-scroll">';
   kanbanCols.forEach(col=>{
-    html+=`<div class="kcol">
-      <div class="kcol-hdr"><div><div class="kcol-name">${col.header}</div><div class="kcol-day">${col.slots.length} caso(s)</div></div><span class="kcol-count">${col.slots.length}</span></div>
+    scrollHtml+=`<div class="kcol">
+      <div class="kcol-hdr"><div style="flex:1"><input class="kcol-name-input" value="${col.header}" onblur="renamePabellon('${col.colLetter}',this.value)"/><div class="kcol-day">${col.slots.length} caso(s)</div></div><span class="kcol-count">${col.slots.length}</span></div>
       <div class="kcol-body" data-drop="col" data-col-letter="${col.colLetter}" data-col-idx="${col.colIdx}">
         ${col.slots.map((s,i)=>kanbanCardHtml(s,col,i+1)).join('')||'<div class="kcard-empty-zone">Arrastra aquí</div>'}
       </div>
     </div>`;
   });
-  board.innerHTML=html;
+  scrollHtml+='</div>';
+  wrapper.innerHTML=fixedHtml+scrollHtml;
   renderWaitlist();
   setupDragDrop();
 }
@@ -676,22 +624,13 @@ function renderWaitlist(){
   const sortBy=document.getElementById('kb-sort')?.value||'prio';
   let wl=diferidosData.filter(r=>r.al==='PROGRAMAR');
   if(filterPrio)wl=wl.filter(r=>r.prio===filterPrio);
-  if(searchQ)wl=wl.filter(r=>(r.nombre||'').toLowerCase().includes(searchQ)||(r.rut||'').replace(/[.\-]/g,'').includes(searchQ.replace(/[.\-]/g,'')));
-  wl.sort((a,b)=>{
-    if(sortBy==='nombre')return (a.nombre||'').localeCompare(b.nombre||'');
-    if(sortBy==='dias')return (parseInt(a.dias)||0)-(parseInt(b.dias)||0);
-    if(sortBy==='dias-desc')return (parseInt(b.dias)||0)-(parseInt(a.dias)||0);
-    // default: prio + dias desc
-    const pA=a.prio==='ALTA'?0:a.prio==='MEDIA'?1:2;const pB=b.prio==='ALTA'?0:b.prio==='MEDIA'?1:2;
-    if(pA!==pB)return pA-pB;return (parseInt(b.dias)||0)-(parseInt(a.dias)||0);
-  });
-  const body=document.getElementById('kb-waitlist-body');
-  if(!body)return;
+  wl=filterSearch(wl,searchQ);
+  sortRows(wl,sortBy);
+  const body=document.getElementById('kb-waitlist-body');if(!body)return;
   body.innerHTML=wl.map(r=>waitCardHtml(r)).join('')||'<div class="kcard-empty-zone">Sin resultados</div>';
-  // Re-attach drag listeners to new cards
   body.querySelectorAll('.kcard').forEach(card=>{
     card.addEventListener('dragstart',e=>{dragSrc=card;card.classList.add('dragging');e.dataTransfer.effectAllowed='move';});
-    card.addEventListener('dragend',()=>{card.classList.remove('dragging');document.querySelectorAll('.kcol-body').forEach(c=>c.classList.remove('dragover'));});
+    card.addEventListener('dragend',()=>{card.classList.remove('dragging');document.querySelectorAll('.kcol-body,.kb-fixed-body').forEach(c=>c.classList.remove('dragover'));});
   });
 }
 
@@ -707,36 +646,28 @@ function waitCardHtml(p){
 }
 
 function kanbanCardHtml(slot,col,turnoNum){
-  const f=slot.fields;
-  const isOperado=(f.COMENTARIO||'').toUpperCase().includes('OPERADO');
-  const stateClass=isOperado?'operado':'tabla';
-  // Try to find matching diferido for prio info
+  const f=slot.fields;const isOp=(f.COMENTARIO||'').toUpperCase().includes('OPERADO');
   const dif=diferidosData.find(r=>r.rut&&r.rut.replace(/[.\-]/g,'')===(f.RUT||'').replace(/[.\-]/g,''));
   const prio=dif?dif.prio:'';
-  return `<div class="kcard ${stateClass}" draggable="true" data-src="kanban" data-col="${col.colLetter}" data-col-idx="${col.colIdx}" data-row-start="${slot.rowStart}" data-rut="${f.RUT}" ondblclick="editarTarjeta(this)">
+  return `<div class="kcard ${isOp?'operado':'tabla'}" draggable="true" data-src="kanban" data-col="${col.colLetter}" data-col-idx="${col.colIdx}" data-row-start="${slot.rowStart}" data-rut="${f.RUT}" ondblclick="editarTarjeta(this)">
     <div class="kcard-top"><span class="kcard-turno">${turnoNum}°</span>${prio?prioTag(prio):''}</div>
     <div class="kcard-name">${f.NOMBRE}</div>
     <div class="kcard-dx">${f.DG||''} ${f.LATERALIDAD?'· '+f.LATERALIDAD:''}</div>
-    <div class="kcard-meta">
-      ${f.EDAD?`<span>${f.EDAD}a</span>`:''}
-      ${f.CX?`<span>${f.CX.substring(0,30)}</span>`:''}
-      ${f.ANESTESIA?`<span>${f.ANESTESIA.substring(0,15)}</span>`:''}
-    </div>
+    <div class="kcard-meta">${f.EDAD?`<span>${f.EDAD}a</span>`:''}${f.CX?`<span>${f.CX.substring(0,30)}</span>`:''}${f.ANESTESIA?`<span>${f.ANESTESIA.substring(0,15)}</span>`:''}</div>
     <div class="kcard-bot">
-      ${isOperado?'<span class="op-stamp">Operado</span>':`<button class="btn btn-s" style="padding:3px 9px;font-size:10px" onclick="event.stopPropagation();marcarOperado(this)">Operar</button>`}
+      ${isOp?'<span class="op-stamp">Operado</span>':`<button class="btn btn-s" style="padding:3px 9px;font-size:10px" onclick="event.stopPropagation();marcarOperado(this)">Operar</button>`}
       <span style="font-size:10px;color:var(--text-3)">${f.CIRUJANOS?f.CIRUJANOS.substring(0,18):''}</span>
     </div>
   </div>`;
 }
 
 // ==================== DRAG & DROP ====================
-let dragSrc=null;
 function setupDragDrop(){
-  document.querySelectorAll('.kcard').forEach(card=>{
+  document.querySelectorAll('.kcol-body .kcard').forEach(card=>{
     card.addEventListener('dragstart',e=>{dragSrc=card;card.classList.add('dragging');e.dataTransfer.effectAllowed='move';});
-    card.addEventListener('dragend',()=>{card.classList.remove('dragging');document.querySelectorAll('.kcol-body').forEach(c=>c.classList.remove('dragover'));});
+    card.addEventListener('dragend',()=>{card.classList.remove('dragging');document.querySelectorAll('.kcol-body,.kb-fixed-body').forEach(c=>c.classList.remove('dragover'));});
   });
-  document.querySelectorAll('.kcol-body').forEach(body=>{
+  document.querySelectorAll('.kcol-body,.kb-fixed-body').forEach(body=>{
     body.addEventListener('dragover',e=>{e.preventDefault();e.dataTransfer.dropEffect='move';body.classList.add('dragover');});
     body.addEventListener('dragleave',()=>body.classList.remove('dragover'));
     body.addEventListener('drop',e=>{e.preventDefault();body.classList.remove('dragover');if(!dragSrc)return;handleDrop(dragSrc,body);});
@@ -744,262 +675,175 @@ function setupDragDrop(){
 }
 
 async function handleDrop(card,targetBody){
-  const srcType=card.dataset.src;
-  const tgtType=targetBody.dataset.drop;
-  if(tgtType==='waitlist'&&srcType==='kanban'){
-    // Return a kanban card to waitlist: clear those cells + set AL=PROGRAMAR in DIFERIDOS
-    if(!confirm('¿Devolver paciente a lista de espera? Se borrarán los datos de pabellón.'))return;
-    await returnToWaitlist(card);return;
-  }
-  if(tgtType==='col'&&srcType==='waitlist'){
-    // Move waitlist patient to a kanban column (find next empty slot)
-    await scheduleFromWaitlist(card,targetBody);return;
-  }
-  if(tgtType==='col'&&srcType==='kanban'){
-    // Move between columns or reorder within column
-    const sameCol=card.dataset.col===targetBody.dataset.colLetter;
-    if(sameCol){toast('Reordenar dentro del mismo pabellón aún no implementado');return;}
-    await moveBetweenColumns(card,targetBody);return;
-  }
+  const srcType=card.dataset.src;const tgtType=targetBody.dataset.drop;
+  if(tgtType==='waitlist'&&srcType==='kanban'){if(!confirm('¿Devolver a lista de espera?'))return;await returnToWaitlist(card);return;}
+  if(tgtType==='col'&&srcType==='waitlist'){showProgramarModal(card,targetBody);return;}
+  if(tgtType==='col'&&srcType==='kanban'){const sameCol=card.dataset.col===targetBody.dataset.colLetter;if(sameCol)return;await moveBetweenColumns(card,targetBody);return;}
 }
 
-async function scheduleFromWaitlist(card,targetBody){
+// ==================== PROGRAMAR (modal on schedule) ====================
+function showProgramarModal(card,targetBody){
   const rut=card.dataset.rut;const ri=parseInt(card.dataset.row);
-  const colLetter=targetBody.dataset.colLetter;
-  const colIdx=parseInt(targetBody.dataset.colIdx);
+  const p=diferidosData.find(r=>r.ri===ri);if(!p)return;
+  const colLetter=targetBody.dataset.colLetter;const colIdx=parseInt(targetBody.dataset.colIdx);
   const targetCol=kanbanCols.find(c=>c.colIdx===colIdx);
-  if(!targetCol){toast('Columna no encontrada');return;}
-  // Find first empty slot in this column
+  pendingSchedule={p,colLetter,colIdx,targetCol,targetBody};
+  document.getElementById('prog-title').textContent=`Programar — ${p.nombre}`;
+  document.getElementById('prog-info').innerHTML=`<div><strong>Paciente</strong>${p.nombre}</div><div><strong>RUT</strong>${p.rut}</div><div><strong>Pabellón</strong>${targetCol?targetCol.header:'—'}</div><div><strong>Diagnóstico</strong>${p.dx} ${p.lat?'· '+p.lat:''}</div>`;
+  ['prog-cx','prog-tiempo','prog-cir','prog-ins','prog-cod','prog-com'].forEach(id=>document.getElementById(id).value='');
+  openM('modal-programar');
+}
+function cancelSchedule(){pendingSchedule=null;}
+
+async function confirmarProgramar(){
+  if(!pendingSchedule)return;
+  const {p,colLetter,colIdx,targetCol}=pendingSchedule;
+  const cx=document.getElementById('prog-cx').value.trim();
+  const tiempo=document.getElementById('prog-tiempo').value;
+  const an=document.getElementById('prog-an').value;
+  const cir=document.getElementById('prog-cir').value.trim();
+  const ins=document.getElementById('prog-ins').value.trim();
+  if(!cx||!tiempo||!cir||!ins){toast('Completa los campos obligatorios (*)');return;}
+  // Find first empty slot
   let slotStart=2;
-  while(true){
-    const used=targetCol.slots.find(s=>s.rowStart===slotStart);
-    if(!used)break;
-    slotStart+=SLOT_HEIGHT;
-  }
-  // Find the diferido data
-  const p=diferidosData.find(r=>r.ri===ri);
-  if(!p){toast('Paciente no encontrado');return;}
-  toast('Agendando paciente... ');
-  // Build the 15 values to write to column colLetter starting at slotStart
-  const values=[
-    [''], // HORA
-    [p.nombre],
-    [p.rut],
-    [p.edad],
-    ['AMB'], // PROCEDENCIA default
-    [p.dx],
-    [p.lat],
-    [''], // CX
-    [''], // CODIGO
-    [''], // TIEMPO CX
-    [''], // ANESTESIA
-    [''], // CIRUJANOS
-    [''], // INSUMOS
-    [''], // BIOPSIA
-    ['']  // COMENTARIO
-  ];
+  if(targetCol)while(targetCol.slots.find(s=>s.rowStart===slotStart))slotStart+=SLOT_HEIGHT;
+  const values=[[''],[p.nombre],[p.rut],[p.edad],[document.getElementById('prog-proc').value],[p.dx],[p.lat],[cx],[document.getElementById('prog-cod').value],[tiempo],[an],[cir],[ins],[document.getElementById('prog-bio').value],[document.getElementById('prog-com').value]];
+  toast('Agendando...');
   try{
     await sheetsUpdate(CFG.sheetT,`'${CFG.tabT}'!${colLetter}${slotStart}:${colLetter}${slotStart+14}`,values);
-    // Update DIFERIDOS AL = "EN TABLA"
-    await sheetsUpdate(CFG.sheetD,`'${CFG.tabD}'!${DCOL.AL}${ri}`,[['EN TABLA']]);
-    addLog(`Agendado ${p.nombre} → ${targetCol.header}`);
-    toast(`${p.nombre} agendado a ${targetCol.header} ✓`);
-    await loadDiferidos();
-    await loadKanban();
+    await sheetsUpdate(CFG.sheetD,`'${CFG.tabD}'!${DCOL.AL}${p.ri}`,[['EN TABLA']]);
+    addLog(`Programado ${p.nombre} → ${targetCol?targetCol.header:colLetter}`);
+    toast(`${p.nombre} agendado ✓`);
+    closeM('modal-programar');pendingSchedule=null;
+    await loadDiferidos();await loadKanban();
   }catch(e){toast('Error: '+(e.message||e));}
 }
 
 async function moveBetweenColumns(card,targetBody){
-  const srcColLetter=card.dataset.col;
-  const srcRowStart=parseInt(card.dataset.rowStart);
-  const tgtColLetter=targetBody.dataset.colLetter;
-  const tgtColIdx=parseInt(targetBody.dataset.colIdx);
-  const tgtCol=kanbanCols.find(c=>c.colIdx===tgtColIdx);
-  // Read source values
-  toast('Moviendo paciente...');
+  const srcCol=card.dataset.col,srcRow=parseInt(card.dataset.rowStart);
+  const tgtCol=targetBody.dataset.colLetter,tgtIdx=parseInt(targetBody.dataset.colIdx);
+  const tgtColObj=kanbanCols.find(c=>c.colIdx===tgtIdx);
+  toast('Moviendo...');
   try{
-    const srcVals=await sheetsGet(CFG.sheetT,`'${CFG.tabT}'!${srcColLetter}${srcRowStart}:${srcColLetter}${srcRowStart+14}`);
-    // Find first empty slot in target
-    let tgtRowStart=2;
-    while(true){
-      const used=tgtCol.slots.find(s=>s.rowStart===tgtRowStart);
-      if(!used)break;
-      tgtRowStart+=SLOT_HEIGHT;
-    }
-    // Pad source to 15 rows
-    const vals=[];
-    for(let i=0;i<15;i++)vals.push([srcVals[i]?(srcVals[i][0]||''):'']);
-    // Batch: write to target, clear source
+    const srcVals=await sheetsGet(CFG.sheetT,`'${CFG.tabT}'!${srcCol}${srcRow}:${srcCol}${srcRow+14}`);
+    let tgtRow=2;if(tgtColObj)while(tgtColObj.slots.find(s=>s.rowStart===tgtRow))tgtRow+=SLOT_HEIGHT;
+    const vals=[];for(let i=0;i<15;i++)vals.push([srcVals[i]?(srcVals[i][0]||''):'']);
     const empty=[];for(let i=0;i<15;i++)empty.push(['']);
-    await sheetsBatch(CFG.sheetT,[
-      {range:`'${CFG.tabT}'!${tgtColLetter}${tgtRowStart}:${tgtColLetter}${tgtRowStart+14}`,values:vals},
-      {range:`'${CFG.tabT}'!${srcColLetter}${srcRowStart}:${srcColLetter}${srcRowStart+14}`,values:empty}
-    ]);
-    const name=vals[1][0]||'paciente';
-    addLog(`Movido ${name} → ${tgtCol.header}`);
-    toast(`${name} movido a ${tgtCol.header} ✓`);
+    await sheetsBatch(CFG.sheetT,[{range:`'${CFG.tabT}'!${tgtCol}${tgtRow}:${tgtCol}${tgtRow+14}`,values:vals},{range:`'${CFG.tabT}'!${srcCol}${srcRow}:${srcCol}${srcRow+14}`,values:empty}]);
+    addLog(`Movido ${vals[1][0]} → ${tgtColObj?tgtColObj.header:tgtCol}`);
+    toast(`Movido a ${tgtColObj?tgtColObj.header:tgtCol} ✓`);
     await loadKanban();
   }catch(e){toast('Error: '+(e.message||e));}
 }
 
 async function returnToWaitlist(card){
-  const srcColLetter=card.dataset.col;
-  const srcRowStart=parseInt(card.dataset.rowStart);
-  const rut=card.dataset.rut;
+  const col=card.dataset.col,row=parseInt(card.dataset.rowStart),rut=card.dataset.rut;
   const dif=diferidosData.find(r=>r.rut&&r.rut.replace(/[.\-]/g,'')===rut.replace(/[.\-]/g,''));
-  toast('Devolviendo a lista de espera...');
+  toast('Devolviendo...');
   try{
     const empty=[];for(let i=0;i<15;i++)empty.push(['']);
-    await sheetsUpdate(CFG.sheetT,`'${CFG.tabT}'!${srcColLetter}${srcRowStart}:${srcColLetter}${srcRowStart+14}`,empty);
-    if(dif){
-      await sheetsUpdate(CFG.sheetD,`'${CFG.tabD}'!${DCOL.AL}${dif.ri}`,[['PROGRAMAR']]);
-      addLog(`Devuelto ${dif.nombre} a lista de espera`);
-    }
-    toast('Paciente devuelto a lista ✓');
-    await loadDiferidos();
+    await sheetsUpdate(CFG.sheetT,`'${CFG.tabT}'!${col}${row}:${col}${row+14}`,empty);
+    if(dif)await sheetsUpdate(CFG.sheetD,`'${CFG.tabD}'!${DCOL.AL}${dif.ri}`,[['PROGRAMAR']]);
+    addLog(`Devuelto ${dif?dif.nombre:rut} a lista`);toast('Devuelto ✓');
+    await loadDiferidos();await loadKanban();
+  }catch(e){toast('Error: '+(e.message||e));}
+}
+
+// ==================== RENAME / ADD PABELLON ====================
+async function renamePabellon(colLetter,newName){
+  if(!newName.trim())return;
+  try{
+    await sheetsUpdate(CFG.sheetT,`'${CFG.tabT}'!${colLetter}1`,[[newName.trim()]]);
+    toast(`Renombrado a "${newName.trim()}" ✓`);
+    addLog(`Pabellón renombrado → ${newName.trim()}`);
+  }catch(e){toast('Error: '+(e.message||e));}
+}
+
+async function addPabellon(){
+  const name=prompt('Nombre del nuevo pabellón:');if(!name)return;
+  // Find next empty column after the last used one
+  const lastCol=kanbanCols.length?kanbanCols[kanbanCols.length-1].colIdx:0;
+  const newColLetter=colLetter(lastCol+1);
+  try{
+    await sheetsUpdate(CFG.sheetT,`'${CFG.tabT}'!${newColLetter}1`,[[name.trim()]]);
+    toast(`Pabellón "${name}" creado ✓`);addLog(`Nuevo pabellón: ${name}`);
     await loadKanban();
   }catch(e){toast('Error: '+(e.message||e));}
 }
 
-// ==================== MARCAR COMO OPERADO ====================
+// ==================== MARCAR OPERADO ====================
 let opContext=null;
 function marcarOperado(btn){
   const card=btn.closest('.kcard');
-  const col=card.dataset.col;
-  const rowStart=parseInt(card.dataset.rowStart);
-  const rut=card.dataset.rut;
+  const col=card.dataset.col,rowStart=parseInt(card.dataset.rowStart),rut=card.dataset.rut;
   const dif=diferidosData.find(r=>r.rut&&r.rut.replace(/[.\-]/g,'')===rut.replace(/[.\-]/g,''));
-  opContext={col,rowStart,rut,dif,colHeader:card.closest('.kcol').querySelector('.kcol-name').textContent};
-  document.getElementById('op-info').innerHTML=`
-    <div><strong>Paciente</strong>${dif?dif.nombre:card.querySelector('.kcard-name').textContent}</div>
-    <div><strong>RUT</strong>${rut||'—'}</div>
-    <div><strong>Pabellón</strong>${opContext.colHeader}</div>
-    <div><strong>Diagnóstico</strong>${dif?dif.dx:'—'}</div>`;
-  document.getElementById('op-fecha').value=toDateInputVal(new Date());
+  opContext={col,rowStart,rut,dif,colHeader:card.closest('.kcol').querySelector('.kcol-name-input').value};
+  document.getElementById('op-info').innerHTML=`<div><strong>Paciente</strong>${dif?dif.nombre:card.querySelector('.kcard-name').textContent}</div><div><strong>RUT</strong>${rut||'—'}</div><div><strong>Pabellón</strong>${opContext.colHeader}</div><div><strong>Diagnóstico</strong>${dif?dif.dx:'—'}</div>`;
+  document.getElementById('op-fecha').value=new Date().toISOString().split('T')[0];
   document.getElementById('op-com').value='';
   openM('modal-operado');
 }
-
 async function confirmarOperado(){
-  if(!opContext)return;
-  const fecha=document.getElementById('op-fecha').value;
-  const com=document.getElementById('op-com').value;
+  if(!opContext)return;const fecha=document.getElementById('op-fecha').value;const com=document.getElementById('op-com').value;
   if(!fecha){toast('Selecciona una fecha');return;}
   const fechaFmt=new Date(fecha+'T12:00:00').toLocaleDateString('es-CL');
-  toast('Registrando operación...');
+  toast('Registrando...');
   try{
-    // Update DIFERIDOS: AL=OPERADO, F_CX=fecha, append to comentarios
     if(opContext.dif){
       const newCom=(opContext.dif.com||'')+(opContext.dif.com?' | ':'')+'OPERADO '+fechaFmt+(com?': '+com:'');
-      await sheetsBatch(CFG.sheetD,[
-        {range:`'${CFG.tabD}'!${DCOL.AL}${opContext.dif.ri}`,values:[['OPERADO']]},
-        {range:`'${CFG.tabD}'!${DCOL.F_CX}${opContext.dif.ri}`,values:[[fechaFmt]]},
-        {range:`'${CFG.tabD}'!${DCOL.COM}${opContext.dif.ri}`,values:[[newCom]]}
-      ]);
+      await sheetsBatch(CFG.sheetD,[{range:`'${CFG.tabD}'!${DCOL.AL}${opContext.dif.ri}`,values:[['OPERADO']]},{range:`'${CFG.tabD}'!${DCOL.F_CX}${opContext.dif.ri}`,values:[[fechaFmt]]},{range:`'${CFG.tabD}'!${DCOL.COM}${opContext.dif.ri}`,values:[[newCom]]}]);
     }
-    // Update kanban COMENTARIO cell (row 16 of slot)
-    const commentRow=opContext.rowStart+14; // COMENTARIO is the 15th field (offset 14)
-    const newCellCom='OPERADO '+fechaFmt+(com?' — '+com:'');
-    await sheetsUpdate(CFG.sheetT,`'${CFG.tabT}'!${opContext.col}${commentRow}`,[[newCellCom]]);
-    addLog(`✓ Marcado OPERADO: ${opContext.dif?opContext.dif.nombre:opContext.rut} (${fechaFmt})`);
-    toast('Operación registrada ✓');
-    closeM('modal-operado');
-    await loadDiferidos();
-    await loadKanban();
+    const commentRow=opContext.rowStart+14;
+    await sheetsUpdate(CFG.sheetT,`'${CFG.tabT}'!${opContext.col}${commentRow}`,[['OPERADO '+fechaFmt+(com?' — '+com:'')]]);
+    addLog(`✓ OPERADO: ${opContext.dif?opContext.dif.nombre:opContext.rut} (${fechaFmt})`);
+    toast('Operación registrada ✓');closeM('modal-operado');
+    await loadDiferidos();await loadKanban();
   }catch(e){toast('Error: '+(e.message||e));}
 }
 
 // ==================== EDITAR TARJETA ====================
 let editContext=null;
 function editarTarjeta(card){
-  const col=card.dataset.col;
-  const rowStart=parseInt(card.dataset.rowStart);
+  const col=card.dataset.col,rowStart=parseInt(card.dataset.rowStart);
   const colInfo=kanbanCols.find(c=>c.colLetter===col);
-  const slot=colInfo?colInfo.slots.find(s=>s.rowStart===rowStart):null;
-  if(!slot)return;
-  editContext={col,rowStart,colHeader:colInfo.header};
-  const f=slot.fields;
+  const slot=colInfo?colInfo.slots.find(s=>s.rowStart===rowStart):null;if(!slot)return;
+  editContext={col,rowStart};const f=slot.fields;
   document.getElementById('cm-title').textContent=`Editar — ${f.NOMBRE}`;
-  document.getElementById('cm-info').innerHTML=`<div><strong>Paciente</strong>${f.NOMBRE}</div><div><strong>RUT</strong>${f.RUT}</div><div><strong>Pabellón</strong>${colInfo.header}</div><div><strong>Edad</strong>${f.EDAD}</div>`;
-  document.getElementById('cm-hora').value=f.HORA||'';
-  document.getElementById('cm-tiempo').value=f.TIEMPO_CX||'';
-  document.getElementById('cm-cx').value=f.CX||'';
-  document.getElementById('cm-cirujanos').value=f.CIRUJANOS||'';
-  document.getElementById('cm-anestesia').value=f.ANESTESIA||'';
-  document.getElementById('cm-codigo').value=f.CODIGO||'';
-  document.getElementById('cm-insumos').value=f.INSUMOS||'';
-  document.getElementById('cm-biopsia').value=f.BIOPSIA||'No';
-  document.getElementById('cm-procedencia').value=f.PROCEDENCIA||'AMB';
-  document.getElementById('cm-comentario').value=f.COMENTARIO||'';
+  document.getElementById('cm-info').innerHTML=`<div><strong>Paciente</strong>${f.NOMBRE}</div><div><strong>RUT</strong>${f.RUT}</div>`;
+  document.getElementById('cm-hora').value=f.HORA||'';document.getElementById('cm-tiempo').value=f.TIEMPO_CX||'';
+  document.getElementById('cm-cx').value=f.CX||'';document.getElementById('cm-cirujanos').value=f.CIRUJANOS||'';
+  document.getElementById('cm-anestesia').value=f.ANESTESIA||'';document.getElementById('cm-codigo').value=f.CODIGO||'';
+  document.getElementById('cm-insumos').value=f.INSUMOS||'';document.getElementById('cm-biopsia').value=f.BIOPSIA||'No';
+  document.getElementById('cm-procedencia').value=f.PROCEDENCIA||'AMB';document.getElementById('cm-comentario').value=f.COMENTARIO||'';
   openM('modal-card');
 }
-
 async function guardarTarjeta(){
-  if(!editContext)return;
-  const col=editContext.col;const rs=editContext.rowStart;
-  // Map field name to row offset
-  const updates={
-    HORA:document.getElementById('cm-hora').value,
-    PROCEDENCIA:document.getElementById('cm-procedencia').value,
-    CX:document.getElementById('cm-cx').value,
-    CODIGO:document.getElementById('cm-codigo').value,
-    TIEMPO_CX:document.getElementById('cm-tiempo').value,
-    ANESTESIA:document.getElementById('cm-anestesia').value,
-    CIRUJANOS:document.getElementById('cm-cirujanos').value,
-    INSUMOS:document.getElementById('cm-insumos').value,
-    BIOPSIA:document.getElementById('cm-biopsia').value,
-    COMENTARIO:document.getElementById('cm-comentario').value
-  };
-  const data=[];
-  Object.keys(updates).forEach(k=>{
-    const offset=FIELDS.indexOf(k);if(offset<0)return;
-    data.push({range:`'${CFG.tabT}'!${col}${rs+offset}`,values:[[updates[k]]]});
-  });
-  try{
-    await sheetsBatch(CFG.sheetT,data);
-    toast('Cambios guardados ✓');
-    closeM('modal-card');
-    await loadKanban();
-  }catch(e){toast('Error: '+(e.message||e));}
+  if(!editContext)return;const {col,rowStart}=editContext;
+  const updates={HORA:document.getElementById('cm-hora').value,PROCEDENCIA:document.getElementById('cm-procedencia').value,CX:document.getElementById('cm-cx').value,CODIGO:document.getElementById('cm-codigo').value,TIEMPO_CX:document.getElementById('cm-tiempo').value,ANESTESIA:document.getElementById('cm-anestesia').value,CIRUJANOS:document.getElementById('cm-cirujanos').value,INSUMOS:document.getElementById('cm-insumos').value,BIOPSIA:document.getElementById('cm-biopsia').value,COMENTARIO:document.getElementById('cm-comentario').value};
+  const data=[];Object.keys(updates).forEach(k=>{const offset=FIELDS.indexOf(k);if(offset<0)return;data.push({range:`'${CFG.tabT}'!${col}${rowStart+offset}`,values:[[updates[k]]]});});
+  try{await sheetsBatch(CFG.sheetT,data);toast('Guardado ✓');closeM('modal-card');await loadKanban();}catch(e){toast('Error: '+(e.message||e));}
 }
 
-// ==================== LOG / HISTORIAL ====================
-function addLog(text){
-  const log=ls.get('log')||[];
-  log.unshift({ts:Date.now(),user:userEmail||'tú',text});
-  if(log.length>50)log.length=50;
-  ls.set('log',log);
-}
+// ==================== LOG ====================
+function addLog(text){const log=ls.get('log')||[];log.unshift({ts:Date.now(),user:userEmail||'tú',text});if(log.length>50)log.length=50;ls.set('log',log);}
 function renderLog(){
-  const log=ls.get('log')||[];
-  const ll=document.getElementById('log-list');
-  if(!log.length){ll.innerHTML='<div class="empty-s">Sin cambios registrados aún.</div>';return;}
-  ll.innerHTML=log.map(e=>{
-    const d=new Date(e.ts);
-    const when=d.toLocaleDateString('es-CL')+' '+d.toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'});
-    return `<div class="log-item"><div class="log-time">${when} · ${e.user}</div><div>${e.text}</div></div>`;
-  }).join('');
+  const log=ls.get('log')||[];const ll=document.getElementById('log-list');
+  if(!log.length){ll.innerHTML='<div class="empty-s">Sin cambios aún.</div>';return;}
+  ll.innerHTML=log.map(e=>{const d=new Date(e.ts);return `<div class="log-item"><div class="log-time">${d.toLocaleDateString('es-CL')} ${d.toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'})} · ${e.user}</div><div>${e.text}</div></div>`;}).join('');
 }
 
 // ==================== CONFIG ====================
 function saveConfig(){
-  CFG.clientId=document.getElementById('cfg-cid').value.trim();
-  CFG.sheetT=document.getElementById('cfg-tid').value.trim();
-  CFG.tabT=document.getElementById('cfg-ttab').value.trim();
-  CFG.sheetD=document.getElementById('cfg-sid').value.trim();
-  CFG.tabD=document.getElementById('cfg-stab').value.trim();
-  ls.set('appCFG',CFG);toast('Configuración guardada ✓');
-}
-function loadCfg(){
-  document.getElementById('cfg-cid').value=CFG.clientId||'';
-  document.getElementById('cfg-tid').value=CFG.sheetT;
-  document.getElementById('cfg-ttab').value=CFG.tabT;
-  document.getElementById('cfg-sid').value=CFG.sheetD;
-  document.getElementById('cfg-stab').value=CFG.tabD;
+  CFG.clientId=document.getElementById('cfg-cid').value.trim();CFG.sheetT=document.getElementById('cfg-tid').value.trim();
+  CFG.tabT=document.getElementById('cfg-ttab').value.trim();CFG.sheetD=document.getElementById('cfg-sid').value.trim();
+  CFG.tabD=document.getElementById('cfg-stab').value.trim();ls.set('appCFG',CFG);toast('Configuración guardada ✓');
 }
 
 // ==================== INIT ====================
-(function(){const s=ls.get('appCFG');if(s)Object.assign(CFG,s);loadCfg();})();
+(function(){const s=ls.get('appCFG');if(s)Object.assign(CFG,s);
+  document.getElementById('cfg-cid').value=CFG.clientId||'';document.getElementById('cfg-tid').value=CFG.sheetT;
+  document.getElementById('cfg-ttab').value=CFG.tabT;document.getElementById('cfg-sid').value=CFG.sheetD;document.getElementById('cfg-stab').value=CFG.tabD;
+})();
 loadGAPI();
 </script>
 </body>
