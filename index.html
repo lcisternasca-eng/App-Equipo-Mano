@@ -241,8 +241,8 @@ tr:hover td{background:var(--bg)}
             </div>
             <div class="tw">
               <table>
-                <thead><tr><th>Nombre</th><th>RUT</th><th>Edad</th><th>Diagnóstico</th><th>Lat.</th><th>Prioridad</th><th>F. lesión</th><th>Días</th><th>Estado</th><th>Teléfono</th><th></th></tr></thead>
-                <tbody id="lista-tb"><tr><td colspan="11" class="empty-s">Cargando...</td></tr></tbody>
+                <thead><tr><th>Nombre</th><th>RUT</th><th>Edad</th><th>Diagnóstico</th><th>Lat.</th><th>Dom.</th><th>Prioridad</th><th>F. lesión</th><th>Días</th><th>Estado</th><th>Teléfono</th><th></th></tr></thead>
+                <tbody id="lista-tb"><tr><td colspan="12" class="empty-s">Cargando...</td></tr></tbody>
               </table>
             </div>
           </div>
@@ -288,6 +288,7 @@ tr:hover td{background:var(--bg)}
         <div class="fg"><label>Edad *</label><input type="number" id="np-edad" min="0" max="120"/></div>
         <div class="fg" style="grid-column:1/-1"><label>Diagnóstico *</label><input type="text" id="np-dx"/></div>
         <div class="fg"><label>Lateralidad *</label><select id="np-lat"><option value="Derecho">Derecho</option><option value="Izquierdo">Izquierdo</option><option value="Bilateral">Bilateral</option></select></div>
+        <div class="fg"><label>Dominancia *</label><select id="np-dom"><option value="Diestro">Diestro</option><option value="Zurdo">Zurdo</option><option value="Ambidiestro">Ambidiestro</option></select></div>
         <div class="fg"><label>Prioridad</label><select id="np-prio"><option value="MEDIA">MEDIA</option><option value="ALTA">ALTA</option><option value="BAJA">BAJA</option></select></div>
         <div class="fg"><label>Fecha accidente *</label><input type="date" id="np-facc"/></div>
         <div class="fg"><label>Teléfono</label><input type="text" id="np-tel" placeholder="+56 9 XXXX XXXX"/></div>
@@ -379,8 +380,8 @@ tr:hover td{background:var(--bg)}
 const CFG={clientId:'177331338816-nkp1hdbv9uogmm228u0e8ada9ehmlb8m.apps.googleusercontent.com',sheetD:'1V48vqYerSrQ2IC6hikePzMoCAASBZfzR3n_i9OvWjgI',tabD:'DIFERIDOS',sheetT:'1DBjeYGeLSSRG68CljiswtZoo_f5oG6wSTFoVaLbfqYE',tabT:'Junio 2026'};
 const SCOPES='https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
 const DISC='https://sheets.googleapis.com/$discovery/rest?version=v4';
-const DCOL_IDX={AL:1,DIAS:2,RUT:3,NOMBRE:4,EDAD:5,DX:6,PRIO:7,F_INGRESO:8,F_ACC:9,F_CX:10,COM:11,TEL:12,LAT:13};
-const DCOL={AL:'B',DIAS:'C',RUT:'D',NOMBRE:'E',EDAD:'F',DX:'G',PRIO:'H',F_INGRESO:'I',F_ACC:'J',F_CX:'K',COM:'L',TEL:'M',LAT:'N'};
+const DCOL_IDX={AL:1,DIAS:2,RUT:3,NOMBRE:4,EDAD:5,DX:6,LAT:7,DOM:8,PRIO:9,F_INGRESO:10,F_ACC:11,F_CX:12,COM:13,TEL:14};
+const DCOL={AL:'B',DIAS:'C',RUT:'D',NOMBRE:'E',EDAD:'F',DX:'G',LAT:'H',DOM:'I',PRIO:'J',F_INGRESO:'K',F_ACC:'L',F_CX:'M',COM:'N',TEL:'O'};
 const FIELDS=['HORA','NOMBRE','RUT','EDAD','PROCEDENCIA','DG','LATERALIDAD','CX','CODIGO','TIEMPO_CX','ANESTESIA','CIRUJANOS','INSUMOS','BIOPSIA','COMENTARIO'];
 const SLOT_HEIGHT=15;
 const MONTHS=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
@@ -452,8 +453,8 @@ async function loadDiferidos(){
   setSB('sb-lista','load','Cargando DIFERIDOS...');
   if(!accessToken){setSB('sb-lista','err','Sin sesión');return;}
   try{
-    const rows=await sheetsGet(CFG.sheetD,`'${CFG.tabD}'!A2:N1000`);
-    diferidosData=rows.map((r,i)=>({ri:i+2,al:r[DCOL_IDX.AL]||'',dias:r[DCOL_IDX.DIAS]||'',rut:r[DCOL_IDX.RUT]||'',nombre:r[DCOL_IDX.NOMBRE]||'',edad:r[DCOL_IDX.EDAD]||'',dx:r[DCOL_IDX.DX]||'',prio:(r[DCOL_IDX.PRIO]||'').toString().trim().toUpperCase(),f_ingreso:r[DCOL_IDX.F_INGRESO]||'',f_acc:r[DCOL_IDX.F_ACC]||'',f_cx:r[DCOL_IDX.F_CX]||'',com:r[DCOL_IDX.COM]||'',tel:r[DCOL_IDX.TEL]||'',lat:r[DCOL_IDX.LAT]||''})).filter(r=>r.nombre);
+    const rows=await sheetsGet(CFG.sheetD,`'${CFG.tabD}'!A2:O1000`);
+    diferidosData=rows.map((r,i)=>({ri:i+2,al:r[DCOL_IDX.AL]||'',dias:r[DCOL_IDX.DIAS]||'',rut:r[DCOL_IDX.RUT]||'',nombre:r[DCOL_IDX.NOMBRE]||'',edad:r[DCOL_IDX.EDAD]||'',dx:r[DCOL_IDX.DX]||'',lat:r[DCOL_IDX.LAT]||'',dom:r[DCOL_IDX.DOM]||'',prio:(r[DCOL_IDX.PRIO]||'').toString().trim().toUpperCase(),f_ingreso:r[DCOL_IDX.F_INGRESO]||'',f_acc:r[DCOL_IDX.F_ACC]||'',f_cx:r[DCOL_IDX.F_CX]||'',com:r[DCOL_IDX.COM]||'',tel:r[DCOL_IDX.TEL]||''})).filter(r=>r.nombre);
     renderLista();updateStats();
     setSB('sb-lista','ok',`${diferidosData.length} pacientes · sync ${new Date().toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'})}`);
   }catch(e){setSB('sb-lista','err','Error: '+(e.message||e));}
@@ -492,9 +493,9 @@ function renderLista(){
   if(fP)rows=rows.filter(r=>r.prio===fP);
   rows=filterSearch(rows,searchQ);
   const tb=document.getElementById('lista-tb');
-  if(!rows.length){tb.innerHTML='<tr><td colspan="11" class="empty-s">Sin resultados.</td></tr>';return;}
+  if(!rows.length){tb.innerHTML='<tr><td colspan="12" class="empty-s">Sin resultados.</td></tr>';return;}
   sortRows(rows,sortBy);
-  tb.innerHTML=rows.map(r=>`<tr><td><strong>${r.nombre}</strong></td><td style="white-space:nowrap">${r.rut}</td><td>${r.edad}</td><td>${r.dx}</td><td>${r.lat||'—'}</td><td>${prioTag(r.prio)}</td><td style="white-space:nowrap">${r.f_acc}</td><td>${diasTag(r.dias)}</td><td>${alBadge(r.al)}</td><td style="white-space:nowrap">${r.tel||'—'}</td><td><button class="bti" onclick="navToKanban()">→</button></td></tr>`).join('');
+  tb.innerHTML=rows.map(r=>`<tr><td><strong>${r.nombre}</strong></td><td style="white-space:nowrap">${r.rut}</td><td>${r.edad}</td><td>${r.dx}</td><td>${r.lat||'—'}</td><td>${r.dom||'—'}</td><td>${prioTag(r.prio)}</td><td style="white-space:nowrap">${r.f_acc}</td><td>${diasTag(r.dias)}</td><td>${alBadge(r.al)}</td><td style="white-space:nowrap">${r.tel||'—'}</td><td><button class="bti" onclick="navToKanban()">→</button></td></tr>`).join('');
 }
 function updateStats(){
   const prog=diferidosData.filter(r=>r.al==='PROGRAMAR').length;
@@ -516,14 +517,13 @@ async function guardarNuevoPac(){
   if(!nom||!rut||!dx||!facc||!edad){toast('Completa los campos obligatorios (*)');return;}
   const faccFmt=fmtDateCL(facc);
   const today=new Date().toLocaleDateString('es-CL');
-  // Row: B=PROGRAMAR C=(blank for DIAS formula) D=RUT E=NOMBRE F=EDAD G=DX H=PRIO I=F_INGRESO J=F_ACC K=F_CX L=COM M=TEL N=LAT
-  const row=['PROGRAMAR','',rut,nom,edad,dx,document.getElementById('np-prio').value,today,faccFmt,'',document.getElementById('np-com').value,document.getElementById('np-tel').value,document.getElementById('np-lat').value];
+  // Row: B=PROGRAMAR C=DIAS(formula) D=RUT E=NOMBRE F=EDAD G=DX H=LAT I=DOM J=PRIO K=F_INGRESO L=F_ACC M=F_CX N=COM O=TEL
+  const row=['PROGRAMAR','',rut,nom,edad,dx,document.getElementById('np-lat').value,document.getElementById('np-dom').value,document.getElementById('np-prio').value,today,faccFmt,'',document.getElementById('np-com').value,document.getElementById('np-tel').value];
   try{
-    // Find next empty row explicitly to avoid offset issues
     const existing=await sheetsGet(CFG.sheetD,`'${CFG.tabD}'!B:B`);
     const nextRow=existing.length+1;
-    row[1]=`=IF(ISBLANK(J${nextRow}); ""; TODAY()-J${nextRow})`;
-    await sheetsUpdate(CFG.sheetD,`'${CFG.tabD}'!B${nextRow}:N${nextRow}`,[row]);
+    row[1]=`=IF(ISBLANK(L${nextRow}); ""; TODAY()-L${nextRow})`;
+    await sheetsUpdate(CFG.sheetD,`'${CFG.tabD}'!B${nextRow}:O${nextRow}`,[row]);
     // Save images locally
     const imgs=document.getElementById('img-np').value;
     if(imgs){const s=ls.get('imgs_e')||{};s[rut]=(s[rut]||[]).concat(JSON.parse(imgs));ls.set('imgs_e',s);}
@@ -641,10 +641,11 @@ function renderWaitlist(){
 
 function waitCardHtml(p){
   const lat=p.lat?` · ${p.lat}`:'';
+  const dom=p.dom?` · ${p.dom}`:'';
   return `<div class="kcard programar" draggable="true" data-src="waitlist" data-row="${p.ri}" data-rut="${p.rut}">
     <div class="kcard-top"><span class="kcard-turno">—</span>${prioTag(p.prio)}</div>
     <div class="kcard-name">${p.nombre}</div>
-    <div class="kcard-dx">${p.dx}${lat}</div>
+    <div class="kcard-dx">${p.dx}${lat}${dom}</div>
     <div class="kcard-meta"><span>${p.edad?p.edad+'a':''}</span>${p.rut?`<span>${p.rut}</span>`:''}</div>
     <div class="kcard-bot">${diasTag(p.dias)}${p.tel?`<span style="font-size:10px;color:var(--text-3)">${p.tel}</span>`:''}</div>
   </div>`;
@@ -694,7 +695,7 @@ function showProgramarModal(card,targetBody){
   const targetCol=kanbanCols.find(c=>c.colIdx===colIdx);
   pendingSchedule={p,colLetter,colIdx,targetCol,targetBody};
   document.getElementById('prog-title').textContent=`Programar — ${p.nombre}`;
-  document.getElementById('prog-info').innerHTML=`<div><strong>Paciente</strong>${p.nombre}</div><div><strong>RUT</strong>${p.rut}</div><div><strong>Pabellón</strong>${targetCol?targetCol.header:'—'}</div><div><strong>Diagnóstico</strong>${p.dx} ${p.lat?'· '+p.lat:''}</div>`;
+  document.getElementById('prog-info').innerHTML=`<div><strong>Paciente</strong>${p.nombre}</div><div><strong>RUT</strong>${p.rut}</div><div><strong>Pabellón</strong>${targetCol?targetCol.header:'—'}</div><div><strong>Diagnóstico</strong>${p.dx} ${p.lat?'· '+p.lat:''} ${p.dom?'· '+p.dom:''}</div>`;
   ['prog-cx','prog-tiempo','prog-cir','prog-ins','prog-cod','prog-com'].forEach(id=>document.getElementById(id).value='');
   openM('modal-programar');
 }
