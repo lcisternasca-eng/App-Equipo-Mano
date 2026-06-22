@@ -72,15 +72,15 @@ tr:hover td{background:var(--bg)}
 .kb-fixed-controls{padding:8px 10px 4px;display:flex;flex-direction:column;gap:5px}
 .kb-fixed-controls input,.kb-fixed-controls select{font-size:11px;padding:5px 8px;border-radius:6px;border:0.5px solid #b8c8de;width:100%}
 .kb-fixed-body{flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:7px}
-.kb-scroll{flex:1;overflow-x:auto;overflow-y:hidden;display:flex;gap:0}
-.kcol{min-width:240px;max-width:240px;background:#ecece8;display:flex;flex-direction:column;max-height:100%;border-right:0.5px solid #d4d4d0}
+.kb-scroll{flex:1;overflow-x:auto;overflow-y:auto;display:flex;gap:0;align-items:flex-start}
+.kcol{min-width:240px;max-width:240px;background:#ecece8;display:flex;flex-direction:column;border-right:0.5px solid #d4d4d0}
 .kcol-hdr{padding:10px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid #d4d4d0}
 .kcol-name{font-size:12px;font-weight:500;color:var(--text)}
 .kcol-name-input{font-size:12px;font-weight:500;color:var(--text);border:none;background:transparent;outline:none;border-bottom:1.5px solid transparent;padding:0 2px;width:100%}
 .kcol-name-input:focus{border-bottom-color:var(--blue)}
 .kcol-day{font-size:10px;color:var(--text-2);margin-top:1px;text-transform:uppercase;letter-spacing:.5px}
 .kcol-count{background:#fff;color:var(--text-2);font-size:10px;font-weight:500;padding:2px 7px;border-radius:10px;border:0.5px solid #d4d4d0}
-.kcol-body{padding:8px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:7px;min-height:80px}
+.kcol-body{padding:8px;display:flex;flex-direction:column;gap:7px;min-height:80px}
 .kcol-body.dragover{background:#dfe9f5;border-radius:8px}
 .kcard{background:#fff;border:0.5px solid #d4d4d0;border-radius:8px;padding:9px 11px;cursor:grab;font-size:12px;box-shadow:0 1px 2px rgba(0,0,0,.03);transition:box-shadow .15s}
 .kcard:hover{box-shadow:0 2px 6px rgba(0,0,0,.08)}
@@ -95,7 +95,10 @@ tr:hover td{background:var(--bg)}
 .kcard-bot{display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-top:6px;border-top:0.5px solid #ecece8}
 .kcard.programar{border-left:3px solid #E4A845}
 .kcard.tabla{border-left:3px solid #639922}
-.kcard.operado{border-left:3px solid #5B7BBA;background:linear-gradient(0deg,rgba(232,240,253,0.4),transparent)}
+.kcard.operado{border-left:4px solid #3B7DD8;background:#e0ecfa;opacity:.75;position:relative}
+.kcard.operado::after{content:"OPERADO";position:absolute;top:8px;right:8px;background:#3B7DD8;color:#fff;font-size:9px;font-weight:600;padding:2px 7px;border-radius:10px;letter-spacing:.5px}
+.kcard.suspendido{border-left:4px solid #C74545;background:#fce8e8;opacity:.75;position:relative}
+.kcard.suspendido::after{content:"SUSPENDIDO";position:absolute;top:8px;right:8px;background:#C74545;color:#fff;font-size:9px;font-weight:600;padding:2px 7px;border-radius:10px;letter-spacing:.5px}
 .op-stamp{display:inline-flex;align-items:center;gap:4px;background:#e8f0fd;color:var(--blue-d);font-size:10px;font-weight:500;padding:2px 7px;border-radius:4px;border:0.5px solid #aecbfa}
 .op-stamp::before{content:"✓";font-weight:bold}
 .kcard-empty-zone{text-align:center;color:var(--text-3);font-size:11px;padding:18px 10px;border:1.5px dashed #d4d4d0;border-radius:8px;margin:4px}
@@ -252,6 +255,7 @@ tr:hover td{background:var(--bg)}
           <div class="month-tabs" id="month-tabs"></div>
           <div class="kb-toolbar">
             <div style="display:flex;gap:7px;align-items:center">
+              <input type="text" id="kb-col-search" placeholder="Buscar en programados..." oninput="filterKanbanCards()" style="font-size:12px;padding:6px 10px;border-radius:var(--r);border:0.5px solid var(--border-mid);width:200px"/>
               <button class="btn" onclick="loadKanban()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg> Sincronizar</button>
               <span class="badge" onclick="openDrawer()" style="cursor:pointer;background:var(--amber-l);color:var(--amber-d)">Historial</span>
             </div>
@@ -329,16 +333,41 @@ tr:hover td{background:var(--bg)}
   </div>
 </div>
 
-<!-- MODAL: Operado -->
-<div class="mbg" id="modal-operado">
-  <div class="modal" style="width:480px">
-    <div class="mhd"><h2>Confirmar operación</h2><button class="bti" onclick="closeM('modal-operado')">✕</button></div>
+<!-- MODAL: Cerrar caso (Operado / Suspendido) -->
+<div class="mbg" id="modal-cerrar">
+  <div class="modal" style="width:500px">
+    <div class="mhd"><h2>Cerrar caso</h2><button class="bti" onclick="closeM('modal-cerrar')">✕</button></div>
     <div class="mbd">
-      <div class="info-grid" id="op-info"></div>
-      <div class="fg"><label>Fecha de operación *</label><input type="date" id="op-fecha"/></div>
-      <div class="fg"><label>Comentarios post-op</label><textarea id="op-com" placeholder="Hallazgos, complicaciones..."></textarea></div>
+      <div class="info-grid" id="cerrar-info"></div>
+      <div class="fg"><label>Resultado *</label>
+        <select id="cerrar-tipo" onchange="toggleCerrarFields()">
+          <option value="OPERADO">✓ Operado</option>
+          <option value="SUSPENDIDO">✕ Suspendido</option>
+        </select>
+      </div>
+      <div id="cerrar-op-fields">
+        <div class="fg"><label>Fecha de operación *</label><input type="date" id="cerrar-fecha"/></div>
+      </div>
+      <div id="cerrar-susp-fields" style="display:none">
+        <div class="fg"><label>Motivo de suspensión *</label>
+          <select id="cerrar-motivo">
+            <option value="Falta de tiempo quirúrgico">Falta de tiempo quirúrgico</option>
+            <option value="Falta de insumos">Falta de insumos</option>
+            <option value="Paciente no asiste">Paciente no asiste</option>
+            <option value="Contraindicación médica">Contraindicación médica</option>
+            <option value="Paciente rechaza CX">Paciente rechaza CX</option>
+            <option value="Falta de pabellón">Falta de pabellón</option>
+            <option value="Otro">Otro</option>
+          </select>
+        </div>
+        <div class="fg"><label>Detalle (opcional)</label><textarea id="cerrar-motivo-det" placeholder="Especificar si es necesario..."></textarea></div>
+        <div style="background:var(--amber-l);border:0.5px solid #f0d68a;border-radius:6px;padding:9px 12px;font-size:11.5px;color:var(--amber-d);line-height:1.5">
+          El paciente quedará marcado como <strong>SUSPENDIDO</strong> en esta fecha. Puedes reprogramarlo arrastrando su tarjeta duplicada a otro día.
+        </div>
+      </div>
+      <div class="fg"><label>Comentarios</label><textarea id="cerrar-com" placeholder="Observaciones..."></textarea></div>
     </div>
-    <div class="mft"><button class="btn" onclick="closeM('modal-operado')">Cancelar</button><button class="btn btn-s" onclick="confirmarOperado()">Confirmar operación</button></div>
+    <div class="mft"><button class="btn" onclick="closeM('modal-cerrar')">Cancelar</button><button class="btn btn-s" id="cerrar-btn" onclick="confirmarCerrar()">Confirmar operación</button></div>
   </div>
 </div>
 
@@ -652,16 +681,19 @@ function waitCardHtml(p){
 }
 
 function kanbanCardHtml(slot,col,turnoNum){
-  const f=slot.fields;const isOp=(f.COMENTARIO||'').toUpperCase().includes('OPERADO');
+  const f=slot.fields;const comUp=(f.COMENTARIO||'').toUpperCase();
+  const isOp=comUp.includes('OPERADO');const isSusp=comUp.includes('SUSPENDIDO');
+  const stateClass=isOp?'operado':isSusp?'suspendido':'tabla';
   const dif=diferidosData.find(r=>r.rut&&r.rut.replace(/[.\-]/g,'')===(f.RUT||'').replace(/[.\-]/g,''));
   const prio=dif?dif.prio:'';
-  return `<div class="kcard ${isOp?'operado':'tabla'}" draggable="true" data-src="kanban" data-col="${col.colLetter}" data-col-idx="${col.colIdx}" data-row-start="${slot.rowStart}" data-rut="${f.RUT}" ondblclick="editarTarjeta(this)">
+  const closed=isOp||isSusp;
+  return `<div class="kcard ${stateClass}" draggable="${!closed}" data-src="kanban" data-col="${col.colLetter}" data-col-idx="${col.colIdx}" data-row-start="${slot.rowStart}" data-rut="${f.RUT}" data-nombre="${f.NOMBRE}" ondblclick="editarTarjeta(this)">
     <div class="kcard-top"><span class="kcard-turno">${turnoNum}°</span>${prio?prioTag(prio):''}</div>
     <div class="kcard-name">${f.NOMBRE}</div>
     <div class="kcard-dx">${f.DG||''} ${f.LATERALIDAD?'· '+f.LATERALIDAD:''}</div>
     <div class="kcard-meta">${f.EDAD?`<span>${f.EDAD}a</span>`:''}${f.CX?`<span>${f.CX.substring(0,30)}</span>`:''}${f.ANESTESIA?`<span>${f.ANESTESIA.substring(0,15)}</span>`:''}</div>
     <div class="kcard-bot">
-      ${isOp?'<span class="op-stamp">Operado</span>':`<button class="btn btn-s" style="padding:3px 9px;font-size:10px" onclick="event.stopPropagation();marcarOperado(this)">Operar</button>`}
+      ${closed?'':`<button class="btn" style="padding:3px 9px;font-size:10px;border-color:var(--border-mid)" onclick="event.stopPropagation();abrirCerrar(this)">Cerrar</button>`}
       <span style="font-size:10px;color:var(--text-3)">${f.CIRUJANOS?f.CIRUJANOS.substring(0,18):''}</span>
     </div>
   </div>`;
@@ -777,34 +809,89 @@ async function addPabellon(){
   }catch(e){toast('Error: '+(e.message||e));}
 }
 
-// ==================== MARCAR OPERADO ====================
-let opContext=null;
-function marcarOperado(btn){
+// ==================== SEARCH KANBAN COLUMNS ====================
+function filterKanbanCards(){
+  const q=(document.getElementById('kb-col-search')?.value||'').toLowerCase().trim();
+  document.querySelectorAll('.kb-scroll .kcard').forEach(card=>{
+    if(!q){card.style.display='';return;}
+    const name=(card.dataset.nombre||card.querySelector('.kcard-name')?.textContent||'').toLowerCase();
+    const rut=(card.dataset.rut||'').replace(/[.\-]/g,'');
+    const match=name.includes(q)||rut.includes(q.replace(/[.\-]/g,''));
+    card.style.display=match?'':'none';
+  });
+}
+
+// ==================== CERRAR CASO (OPERADO / SUSPENDIDO) ====================
+let cerrarContext=null;
+function toggleCerrarFields(){
+  const tipo=document.getElementById('cerrar-tipo').value;
+  document.getElementById('cerrar-op-fields').style.display=tipo==='OPERADO'?'block':'none';
+  document.getElementById('cerrar-susp-fields').style.display=tipo==='SUSPENDIDO'?'block':'none';
+  document.getElementById('cerrar-btn').textContent=tipo==='OPERADO'?'Confirmar operación':'Confirmar suspensión';
+  document.getElementById('cerrar-btn').className=tipo==='OPERADO'?'btn btn-s':'btn btn-p';
+}
+
+function abrirCerrar(btn){
   const card=btn.closest('.kcard');
   const col=card.dataset.col,rowStart=parseInt(card.dataset.rowStart),rut=card.dataset.rut;
   const dif=diferidosData.find(r=>r.rut&&r.rut.replace(/[.\-]/g,'')===rut.replace(/[.\-]/g,''));
-  opContext={col,rowStart,rut,dif,colHeader:card.closest('.kcol').querySelector('.kcol-name-input').value};
-  document.getElementById('op-info').innerHTML=`<div><strong>Paciente</strong>${dif?dif.nombre:card.querySelector('.kcard-name').textContent}</div><div><strong>RUT</strong>${rut||'—'}</div><div><strong>Pabellón</strong>${opContext.colHeader}</div><div><strong>Diagnóstico</strong>${dif?dif.dx:'—'}</div>`;
-  document.getElementById('op-fecha').value=new Date().toISOString().split('T')[0];
-  document.getElementById('op-com').value='';
-  openM('modal-operado');
+  const colEl=card.closest('.kcol');
+  cerrarContext={col,rowStart,rut,dif,colHeader:colEl?colEl.querySelector('.kcol-name-input')?.value||'':'',card};
+  document.getElementById('cerrar-info').innerHTML=`<div><strong>Paciente</strong>${dif?dif.nombre:card.querySelector('.kcard-name').textContent}</div><div><strong>RUT</strong>${rut||'—'}</div><div><strong>Pabellón</strong>${cerrarContext.colHeader}</div><div><strong>Diagnóstico</strong>${dif?dif.dx:'—'}</div>`;
+  document.getElementById('cerrar-fecha').value=new Date().toISOString().split('T')[0];
+  document.getElementById('cerrar-com').value='';
+  document.getElementById('cerrar-tipo').value='OPERADO';
+  toggleCerrarFields();
+  openM('modal-cerrar');
 }
-async function confirmarOperado(){
-  if(!opContext)return;const fecha=document.getElementById('op-fecha').value;const com=document.getElementById('op-com').value;
-  if(!fecha){toast('Selecciona una fecha');return;}
-  const fechaFmt=new Date(fecha+'T12:00:00').toLocaleDateString('es-CL');
-  toast('Registrando...');
-  try{
-    if(opContext.dif){
-      const newCom=(opContext.dif.com||'')+(opContext.dif.com?' | ':'')+'OPERADO '+fechaFmt+(com?': '+com:'');
-      await sheetsBatch(CFG.sheetD,[{range:`'${CFG.tabD}'!${DCOL.AL}${opContext.dif.ri}`,values:[['OPERADO']]},{range:`'${CFG.tabD}'!${DCOL.F_CX}${opContext.dif.ri}`,values:[[fechaFmt]]},{range:`'${CFG.tabD}'!${DCOL.COM}${opContext.dif.ri}`,values:[[newCom]]}]);
-    }
-    const commentRow=opContext.rowStart+14;
-    await sheetsUpdate(CFG.sheetT,`'${CFG.tabT}'!${opContext.col}${commentRow}`,[['OPERADO '+fechaFmt+(com?' — '+com:'')]]);
-    addLog(`✓ OPERADO: ${opContext.dif?opContext.dif.nombre:opContext.rut} (${fechaFmt})`);
-    toast('Operación registrada ✓');closeM('modal-operado');
-    await loadDiferidos();await loadKanban();
-  }catch(e){toast('Error: '+(e.message||e));}
+
+async function confirmarCerrar(){
+  if(!cerrarContext)return;
+  const tipo=document.getElementById('cerrar-tipo').value;
+  const com=document.getElementById('cerrar-com').value;
+  if(tipo==='OPERADO'){
+    const fecha=document.getElementById('cerrar-fecha').value;
+    if(!fecha){toast('Selecciona una fecha');return;}
+    const fechaFmt=new Date(fecha+'T12:00:00').toLocaleDateString('es-CL');
+    toast('Registrando operación...');
+    try{
+      if(cerrarContext.dif){
+        const newCom=(cerrarContext.dif.com||'')+(cerrarContext.dif.com?' | ':'')+'OPERADO '+fechaFmt+(com?': '+com:'');
+        await sheetsBatch(CFG.sheetD,[
+          {range:`'${CFG.tabD}'!${DCOL.AL}${cerrarContext.dif.ri}`,values:[['OPERADO']]},
+          {range:`'${CFG.tabD}'!${DCOL.F_CX}${cerrarContext.dif.ri}`,values:[[fechaFmt]]},
+          {range:`'${CFG.tabD}'!${DCOL.COM}${cerrarContext.dif.ri}`,values:[[newCom]]}
+        ]);
+      }
+      const commentRow=cerrarContext.rowStart+14;
+      await sheetsUpdate(CFG.sheetT,`'${CFG.tabT}'!${cerrarContext.col}${commentRow}`,[['OPERADO '+fechaFmt+(com?' — '+com:'')]]);
+      addLog(`✓ OPERADO: ${cerrarContext.dif?cerrarContext.dif.nombre:cerrarContext.rut} (${fechaFmt})`);
+      toast('Operación registrada ✓');
+    }catch(e){toast('Error: '+(e.message||e));return;}
+  } else {
+    // SUSPENDIDO
+    const motivo=document.getElementById('cerrar-motivo').value;
+    const det=document.getElementById('cerrar-motivo-det').value;
+    const suspText='SUSPENDIDO: '+motivo+(det?' — '+det:'')+(com?' | '+com:'');
+    toast('Registrando suspensión...');
+    try{
+      // Mark the card as suspended in the tabla sheet
+      const commentRow=cerrarContext.rowStart+14;
+      await sheetsUpdate(CFG.sheetT,`'${CFG.tabT}'!${cerrarContext.col}${commentRow}`,[[suspText]]);
+      // In DIFERIDOS, keep as PROGRAMAR so it can be rescheduled, add note
+      if(cerrarContext.dif){
+        const newCom=(cerrarContext.dif.com||'')+(cerrarContext.dif.com?' | ':'')+suspText+' ('+new Date().toLocaleDateString('es-CL')+')';
+        await sheetsBatch(CFG.sheetD,[
+          {range:`'${CFG.tabD}'!${DCOL.AL}${cerrarContext.dif.ri}`,values:[['PROGRAMAR']]},
+          {range:`'${CFG.tabD}'!${DCOL.COM}${cerrarContext.dif.ri}`,values:[[newCom]]}
+        ]);
+      }
+      addLog(`✕ SUSPENDIDO: ${cerrarContext.dif?cerrarContext.dif.nombre:cerrarContext.rut} — ${motivo}`);
+      toast('Suspensión registrada. Paciente vuelve a lista de espera para reprogramar ✓');
+    }catch(e){toast('Error: '+(e.message||e));return;}
+  }
+  closeM('modal-cerrar');cerrarContext=null;
+  await loadDiferidos();await loadKanban();
 }
 
 // ==================== EDITAR TARJETA ====================
