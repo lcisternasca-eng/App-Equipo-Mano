@@ -623,6 +623,7 @@ async function loadKanban(){
       kanbanCols.push({header:h.trim(),colIdx,colLetter:colLetter(colIdx),slots});
     });
     renderBoard();
+    loadInsumosPresets(); // preload presets in background
     setSB('sb-kanban','ok',`${kanbanCols.length} pabellones · ${kanbanCols.reduce((s,c)=>s+c.slots.length,0)} cirugías`);
   }catch(e){setSB('sb-kanban','err','Error: '+(e.message||e));}
 }
@@ -721,7 +722,7 @@ function setupDragDrop(){
 async function handleDrop(card,targetBody){
   const srcType=card.dataset.src;const tgtType=targetBody.dataset.drop;
   if(tgtType==='waitlist'&&srcType==='kanban'){if(!confirm('¿Devolver a lista de espera?'))return;await returnToWaitlist(card);return;}
-  if(tgtType==='col'&&srcType==='waitlist'){await showProgramarModal(card,targetBody);return;}
+  if(tgtType==='col'&&srcType==='waitlist'){showProgramarModal(card,targetBody);return;}
   if(tgtType==='col'&&srcType==='kanban'){const sameCol=card.dataset.col===targetBody.dataset.colLetter;if(sameCol)return;await moveBetweenColumns(card,targetBody);return;}
 }
 
@@ -754,7 +755,7 @@ function applyCxPreset(){
 }
 
 // ==================== PROGRAMAR (modal on schedule) ====================
-async function showProgramarModal(card,targetBody){
+function showProgramarModal(card,targetBody){
   const rut=card.dataset.rut;const ri=parseInt(card.dataset.row);
   const p=diferidosData.find(r=>r.ri===ri);if(!p)return;
   const colLetter=targetBody.dataset.colLetter;const colIdx=parseInt(targetBody.dataset.colIdx);
@@ -764,11 +765,8 @@ async function showProgramarModal(card,targetBody){
   document.getElementById('prog-info').innerHTML=`<div><strong>Paciente</strong>${p.nombre}</div><div><strong>RUT</strong>${p.rut}</div><div><strong>Pabellón</strong>${targetCol?targetCol.header:'—'}</div><div><strong>Diagnóstico</strong>${p.dx} ${p.lat?'· '+p.lat:''} ${p.dom?'· '+p.dom:''}</div>`;
   ['prog-cx','prog-tiempo','prog-cir','prog-ins','prog-cod','prog-com'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('prog-cx-preset').value='';
-  // Auto-suggest turno based on existing slots
   const nextTurno=targetCol?(targetCol.slots.length+1):1;
   document.getElementById('prog-turno').value=nextTurno<=6?nextTurno+'°':'Condicional';
-  // Load presets
-  await loadInsumosPresets();
   populateCxPresets();
   openM('modal-programar');
 }
