@@ -234,7 +234,7 @@ tr:hover td{background:var(--bg)}
                   <option value="">Todas prioridades</option><option value="ALTA">ALTA</option><option value="MEDIA">MEDIA</option><option value="BAJA">BAJA</option>
                 </select>
                 <select id="sort-lista" onchange="renderLista()" style="font-size:12px;padding:5px 8px;border-radius:var(--r);border:0.5px solid var(--border-mid);background:var(--surface);color:var(--text)">
-                  <option value="prio">Prioridad + días</option><option value="nombre">Nombre A→Z</option><option value="nombre-desc">Nombre Z→A</option><option value="rut">RUT</option><option value="edad">Edad ↑</option><option value="edad-desc">Edad ↓</option><option value="dias-desc">Días ↓</option><option value="dias">Días ↑</option>
+                  <option value="reciente">Más recientes primero</option><option value="prio">Prioridad + días</option><option value="nombre">Nombre A→Z</option><option value="nombre-desc">Nombre Z→A</option><option value="rut">RUT</option><option value="edad">Edad ↑</option><option value="edad-desc">Edad ↓</option><option value="dias-desc">Días ↓</option><option value="dias">Días ↑</option>
                 </select>
                 <button class="btn" onclick="loadDiferidos()">Actualizar</button>
               </div>
@@ -464,6 +464,7 @@ function alBadge(al){if(al==='PROGRAMAR')return '<span class="badge b-wait">PROG
 
 function sortRows(rows,sortBy){
   return rows.sort((a,b)=>{
+    if(sortBy==='reciente')return (b.ri||0)-(a.ri||0);
     if(sortBy==='nombre')return (a.nombre||'').localeCompare(b.nombre||'');
     if(sortBy==='nombre-desc')return (b.nombre||'').localeCompare(a.nombre||'');
     if(sortBy==='rut')return (a.rut||'').localeCompare(b.rut||'');
@@ -515,10 +516,10 @@ async function guardarNuevoPac(){
   if(!nom||!rut||!dx||!facc||!edad){toast('Completa los campos obligatorios (*)');return;}
   const faccFmt=fmtDateCL(facc);
   const today=new Date().toLocaleDateString('es-CL');
-  // Row: A(empty for formula) B=PROGRAMAR C=formula D=RUT E=NOMBRE F=EDAD G=DX H=PRIO I=F_INGRESO J=F_ACC K=F_CX L=COM M=TEL N=LAT
-  const row=['','PROGRAMAR','',rut,nom,edad,dx,document.getElementById('np-prio').value,today,faccFmt,'',document.getElementById('np-com').value,document.getElementById('np-tel').value,document.getElementById('np-lat').value];
+  // Row: B=PROGRAMAR C=(blank for DIAS formula) D=RUT E=NOMBRE F=EDAD G=DX H=PRIO I=F_INGRESO J=F_ACC K=F_CX L=COM M=TEL N=LAT
+  const row=['PROGRAMAR','',rut,nom,edad,dx,document.getElementById('np-prio').value,today,faccFmt,'',document.getElementById('np-com').value,document.getElementById('np-tel').value,document.getElementById('np-lat').value];
   try{
-    await sheetsAppend(CFG.sheetD,`'${CFG.tabD}'!A:N`,row);
+    await sheetsAppend(CFG.sheetD,`'${CFG.tabD}'!B:N`,row);
     // Save images locally
     const imgs=document.getElementById('img-np').value;
     if(imgs){const s=ls.get('imgs_e')||{};s[rut]=(s[rut]||[]).concat(JSON.parse(imgs));ls.set('imgs_e',s);}
