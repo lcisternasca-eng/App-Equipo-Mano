@@ -721,7 +721,7 @@ function setupDragDrop(){
 async function handleDrop(card,targetBody){
   const srcType=card.dataset.src;const tgtType=targetBody.dataset.drop;
   if(tgtType==='waitlist'&&srcType==='kanban'){if(!confirm('¿Devolver a lista de espera?'))return;await returnToWaitlist(card);return;}
-  if(tgtType==='col'&&srcType==='waitlist'){showProgramarModal(card,targetBody);return;}
+  if(tgtType==='col'&&srcType==='waitlist'){await showProgramarModal(card,targetBody);return;}
   if(tgtType==='col'&&srcType==='kanban'){const sameCol=card.dataset.col===targetBody.dataset.colLetter;if(sameCol)return;await moveBetweenColumns(card,targetBody);return;}
 }
 
