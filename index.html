@@ -522,6 +522,7 @@ async function guardarNuevoPac(){
     // Find next empty row explicitly to avoid offset issues
     const existing=await sheetsGet(CFG.sheetD,`'${CFG.tabD}'!B:B`);
     const nextRow=existing.length+1;
+    row[1]=`=IF(ISBLANK(J${nextRow}); ""; TODAY()-J${nextRow})`;
     await sheetsUpdate(CFG.sheetD,`'${CFG.tabD}'!B${nextRow}:N${nextRow}`,[row]);
     // Save images locally
     const imgs=document.getElementById('img-np').value;
