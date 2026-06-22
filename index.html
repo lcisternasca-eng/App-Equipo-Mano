@@ -519,7 +519,10 @@ async function guardarNuevoPac(){
   // Row: B=PROGRAMAR C=(blank for DIAS formula) D=RUT E=NOMBRE F=EDAD G=DX H=PRIO I=F_INGRESO J=F_ACC K=F_CX L=COM M=TEL N=LAT
   const row=['PROGRAMAR','',rut,nom,edad,dx,document.getElementById('np-prio').value,today,faccFmt,'',document.getElementById('np-com').value,document.getElementById('np-tel').value,document.getElementById('np-lat').value];
   try{
-    await sheetsAppend(CFG.sheetD,`'${CFG.tabD}'!B:N`,row);
+    // Find next empty row explicitly to avoid offset issues
+    const existing=await sheetsGet(CFG.sheetD,`'${CFG.tabD}'!B:B`);
+    const nextRow=existing.length+1;
+    await sheetsUpdate(CFG.sheetD,`'${CFG.tabD}'!B${nextRow}:N${nextRow}`,[row]);
     // Save images locally
     const imgs=document.getElementById('img-np').value;
     if(imgs){const s=ls.get('imgs_e')||{};s[rut]=(s[rut]||[]).concat(JSON.parse(imgs));ls.set('imgs_e',s);}
