@@ -318,14 +318,20 @@ tr:hover td{background:var(--bg)}
     <div class="mbd">
       <div class="info-grid" id="prog-info"></div>
       <div class="fg2">
-        <div class="fg" style="grid-column:1/-1"><label>Cirugía (CX) *</label><input type="text" id="prog-cx" placeholder="Ej: Red y OTS, Artrodesis MCF..."/></div>
+        <div class="fg"><label>Turno *</label>
+          <select id="prog-turno"><option>1°</option><option>2°</option><option>3°</option><option>4°</option><option>5°</option><option>6°</option><option>Condicional</option></select>
+        </div>
+        <div class="fg"><label>Procedencia</label><select id="prog-proc"><option>AMB</option><option>HOSP</option><option>URG</option></select></div>
+        <div class="fg" style="grid-column:1/-1"><label>Cirugía (CX) — seleccionar preset o escribir *</label>
+          <select id="prog-cx-preset" onchange="applyCxPreset()" style="margin-bottom:4px"><option value="">— Escribir manualmente —</option></select>
+          <input type="text" id="prog-cx" placeholder="Ej: Red y OTS, Artrodesis MCF..."/>
+        </div>
         <div class="fg"><label>Tiempo CX (min) *</label><input type="number" id="prog-tiempo" placeholder="90"/></div>
         <div class="fg"><label>Anestesia *</label><select id="prog-an"><option>Regional</option><option>General</option><option>Local + sedación</option><option>Local</option><option>TIVA</option></select></div>
         <div class="fg" style="grid-column:1/-1"><label>Cirujanos *</label><input type="text" id="prog-cir" placeholder="Ej: García / Rojas"/></div>
-        <div class="fg" style="grid-column:1/-1"><label>Insumos *</label><textarea id="prog-ins" placeholder="Implantes, materiales especiales..."></textarea></div>
+        <div class="fg" style="grid-column:1/-1"><label>Insumos *</label><textarea id="prog-ins" placeholder="Implantes, materiales especiales..." rows="3"></textarea></div>
         <div class="fg"><label>Código</label><input type="text" id="prog-cod"/></div>
         <div class="fg"><label>Biopsia</label><select id="prog-bio"><option>No</option><option>Sí</option></select></div>
-        <div class="fg"><label>Procedencia</label><select id="prog-proc"><option>AMB</option><option>HOSP</option><option>URG</option></select></div>
         <div class="fg" style="grid-column:1/-1"><label>Comentario</label><textarea id="prog-com"></textarea></div>
       </div>
     </div>
@@ -719,8 +725,36 @@ async function handleDrop(card,targetBody){
   if(tgtType==='col'&&srcType==='kanban'){const sameCol=card.dataset.col===targetBody.dataset.colLetter;if(sameCol)return;await moveBetweenColumns(card,targetBody);return;}
 }
 
+// ==================== INSUMOS PRESETS ====================
+let insumosPresets=[];
+async function loadInsumosPresets(){
+  if(insumosPresets.length)return;
+  try{
+    const rows=await sheetsGet(CFG.sheetT,`'Insumos'!B2:N3`);
+    if(!rows||rows.length<2)return;
+    const nombres=rows[0]||[];const insumos=rows[1]||[];
+    insumosPresets=[];
+    for(let i=0;i<nombres.length;i++){
+      if(nombres[i]&&nombres[i].trim())insumosPresets.push({nombre:nombres[i].trim(),insumos:(insumos[i]||'').trim()});
+    }
+  }catch(e){console.log('No se pudo cargar hoja Insumos:',e);}
+}
+function populateCxPresets(){
+  const sel=document.getElementById('prog-cx-preset');
+  sel.innerHTML='<option value="">— Escribir manualmente —</option>';
+  insumosPresets.forEach((p,i)=>{sel.innerHTML+=`<option value="${i}">${p.nombre}</option>`;});
+}
+function applyCxPreset(){
+  const idx=document.getElementById('prog-cx-preset').value;
+  if(idx==='')return;
+  const preset=insumosPresets[parseInt(idx)];
+  if(!preset)return;
+  document.getElementById('prog-cx').value=preset.nombre;
+  document.getElementById('prog-ins').value=preset.insumos;
+}
+
 // ==================== PROGRAMAR (modal on schedule) ====================
-function showProgramarModal(card,targetBody){
+async function showProgramarModal(card,targetBody){
   const rut=card.dataset.rut;const ri=parseInt(card.dataset.row);
   const p=diferidosData.find(r=>r.ri===ri);if(!p)return;
   const colLetter=targetBody.dataset.colLetter;const colIdx=parseInt(targetBody.dataset.colIdx);
@@ -729,6 +763,13 @@ function showProgramarModal(card,targetBody){
   document.getElementById('prog-title').textContent=`Programar — ${p.nombre}`;
   document.getElementById('prog-info').innerHTML=`<div><strong>Paciente</strong>${p.nombre}</div><div><strong>RUT</strong>${p.rut}</div><div><strong>Pabellón</strong>${targetCol?targetCol.header:'—'}</div><div><strong>Diagnóstico</strong>${p.dx} ${p.lat?'· '+p.lat:''} ${p.dom?'· '+p.dom:''}</div>`;
   ['prog-cx','prog-tiempo','prog-cir','prog-ins','prog-cod','prog-com'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('prog-cx-preset').value='';
+  // Auto-suggest turno based on existing slots
+  const nextTurno=targetCol?(targetCol.slots.length+1):1;
+  document.getElementById('prog-turno').value=nextTurno<=6?nextTurno+'°':'Condicional';
+  // Load presets
+  await loadInsumosPresets();
+  populateCxPresets();
   openM('modal-programar');
 }
 function cancelSchedule(){pendingSchedule=null;}
@@ -736,6 +777,7 @@ function cancelSchedule(){pendingSchedule=null;}
 async function confirmarProgramar(){
   if(!pendingSchedule)return;
   const {p,colLetter,colIdx,targetCol}=pendingSchedule;
+  const turno=document.getElementById('prog-turno').value;
   const cx=document.getElementById('prog-cx').value.trim();
   const tiempo=document.getElementById('prog-tiempo').value;
   const an=document.getElementById('prog-an').value;
@@ -745,7 +787,7 @@ async function confirmarProgramar(){
   // Find first empty slot
   let slotStart=2;
   if(targetCol)while(targetCol.slots.find(s=>s.rowStart===slotStart))slotStart+=SLOT_HEIGHT;
-  const values=[[''],[p.nombre],[p.rut],[p.edad],[document.getElementById('prog-proc').value],[p.dx],[p.lat],[cx],[document.getElementById('prog-cod').value],[tiempo],[an],[cir],[ins],[document.getElementById('prog-bio').value],[document.getElementById('prog-com').value]];
+  const values=[[turno],[p.nombre],[p.rut],[p.edad],[document.getElementById('prog-proc').value],[p.dx],[p.lat],[cx],[document.getElementById('prog-cod').value],[tiempo],[an],[cir],[ins],[document.getElementById('prog-bio').value],[document.getElementById('prog-com').value]];
   toast('Agendando...');
   try{
     await sheetsUpdate(CFG.sheetT,`'${CFG.tabT}'!${colLetter}${slotStart}:${colLetter}${slotStart+14}`,values);
