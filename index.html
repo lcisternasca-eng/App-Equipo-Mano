@@ -589,6 +589,7 @@ function renderMonthTabs(){
     const isActive=CFG.tabT===tabName;
     html+=`<div class="month-tab ${isActive?'active':''}" onclick="switchMonth('${tabName}')">${label}</div>`;
   }
+  html+=`<div class="month-tab" style="color:var(--blue);font-weight:500" onclick="openCreateMonth()">+ Crear mes</div>`;
   tabs.innerHTML=html;
 }
 function switchMonth(tabName){
@@ -597,6 +598,82 @@ function switchMonth(tabName){
   ls.set('appCFG',CFG);
   renderMonthTabs();
   loadKanban();
+}
+
+const DIAS_SEMANA=['DOMINGO','LUNES','MARTES','MIÉRCOLES','JUEVES','VIERNES','SÁBADO'];
+
+function openCreateMonth(){
+  const now=new Date();
+  // Suggest next month
+  let sugMonth=now.getMonth()+1;let sugYear=now.getFullYear();
+  if(sugMonth>11){sugMonth=0;sugYear++;}
+  const sugName=`${MONTHS[sugMonth]} ${sugYear}`;
+  const name=prompt('Nombre de la pestaña del nuevo mes:',sugName);
+  if(!name)return;
+  // Parse month and year from name
+  const parts=name.trim().split(' ');
+  const mIdx=MONTHS.indexOf(parts[0]);
+  const yr=parseInt(parts[1]);
+  if(mIdx<0||isNaN(yr)){toast('Formato debe ser "Mes Año" (ej: Julio 2026)');return;}
+  createMonth(name.trim(),mIdx,yr);
+}
+
+async function createMonth(tabName,monthIdx,year){
+  toast('Creando pestaña y calendario...');
+  try{
+    // 1. Create new sheet tab with frozen columns
+    await gapi.client.sheets.spreadsheets.batchUpdate({
+      spreadsheetId:CFG.sheetT,
+      resource:{requests:[{addSheet:{properties:{title:tabName,gridProperties:{frozenColumnCount:2,frozenRowCount:1}}}}]}
+    });
+
+    // 2. Calculate weekdays for this month
+    const daysInMonth=new Date(year,monthIdx+1,0).getDate();
+    const weekdays=[];
+    for(let d=1;d<=daysInMonth;d++){
+      const date=new Date(year,monthIdx,d);
+      const dow=date.getDay();
+      if(dow>=1&&dow<=5){
+        weekdays.push({day:d,name:DIAS_SEMANA[dow],padDay:String(d).padStart(2,'0')});
+      }
+    }
+
+    // 3. Build data grid
+    const SLOTS=5; // 5 surgery slots per column
+    const totalRows=1+SLOTS*SLOT_HEIGHT; // header + slots
+    const totalCols=2+weekdays.length; // A + B + weekday columns
+
+    // Row 1: headers
+    const row1=['','PROGRAMAR'];
+    weekdays.forEach(wd=>{row1.push(`${wd.name} ${wd.padDay}`);});
+
+    // Build all rows
+    const allRows=[row1];
+    for(let s=0;s<SLOTS;s++){
+      for(let f=0;f<FIELDS.length;f++){
+        const row=[FIELDS[f].replace('_',' '),''];
+        // Empty cells for each weekday column
+        for(let w=0;w<weekdays.length;w++) row.push('');
+        allRows.push(row);
+      }
+    }
+
+    // 4. Write all data
+    const lastCol=colLetter(totalCols-1);
+    await sheetsUpdate(CFG.sheetT,`'${tabName}'!A1:${lastCol}${totalRows}`,allRows);
+
+    addLog(`Mes creado: ${tabName} (${weekdays.length} días hábiles)`);
+    toast(`${tabName} creado con ${weekdays.length} columnas ✓`);
+
+    // Switch to the new month
+    switchMonth(tabName);
+  }catch(e){
+    if(e.result&&e.result.error&&e.result.error.message.includes('already exists')){
+      toast('Esa pestaña ya existe. Usa otro nombre o cambia directamente.');
+    }else{
+      toast('Error: '+(e.result?.error?.message||e.message||e));
+    }
+  }
 }
 
 // ==================== KANBAN ====================
