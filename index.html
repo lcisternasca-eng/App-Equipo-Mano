@@ -619,57 +619,75 @@ function openCreateMonth(){
 }
 
 async function createMonth(tabName,monthIdx,year){
-  toast('Creando pestaña y calendario...');
+  toast('Creando pestaña con formato...');
   try{
-    // 1. Create new sheet tab with frozen columns
-    await gapi.client.sheets.spreadsheets.batchUpdate({
-      spreadsheetId:CFG.sheetT,
-      resource:{requests:[{addSheet:{properties:{title:tabName,gridProperties:{frozenColumnCount:2,frozenRowCount:1}}}}]}
-    });
+    // 1. Get current sheet's sheetId
+    const meta=await gapi.client.sheets.spreadsheets.get({spreadsheetId:CFG.sheetT});
+    const currentSheet=meta.result.sheets.find(s=>s.properties.title===CFG.tabT);
+    if(!currentSheet){toast('No se encontró la pestaña actual para copiar formato');return;}
+    const srcId=currentSheet.properties.sheetId;
 
-    // 2. Calculate weekdays for this month
+    // 2. Duplicate the sheet (copies all formatting, colors, fonts, column widths)
+    const dupResult=await gapi.client.sheets.spreadsheets.batchUpdate({
+      spreadsheetId:CFG.sheetT,
+      resource:{requests:[{duplicateSheet:{sourceSheetId:srcId,newSheetName:tabName}}]}
+    });
+    const newSheetId=dupResult.result.replies[0].duplicateSheet.properties.sheetId;
+
+    // 3. Calculate weekdays for the new month
     const daysInMonth=new Date(year,monthIdx+1,0).getDate();
     const weekdays=[];
     for(let d=1;d<=daysInMonth;d++){
       const date=new Date(year,monthIdx,d);
       const dow=date.getDay();
-      if(dow>=1&&dow<=5){
-        weekdays.push({day:d,name:DIAS_SEMANA[dow],padDay:String(d).padStart(2,'0')});
-      }
+      if(dow>=1&&dow<=5) weekdays.push({day:d,name:DIAS_SEMANA[dow],padDay:String(d).padStart(2,'0')});
     }
 
-    // 3. Build data grid
-    const SLOTS=5; // 5 surgery slots per column
-    const totalRows=1+SLOTS*SLOT_HEIGHT; // header + slots
-    const totalCols=2+weekdays.length; // A + B + weekday columns
+    // 4. Figure out how many data columns exist (from the duplicated sheet)
+    const existingHeaders=await sheetsGet(CFG.sheetT,`'${tabName}'!1:1`);
+    const totalExistingCols=existingHeaders[0]?existingHeaders[0].length:20;
 
-    // Row 1: headers
-    const row1=['','PROGRAMAR'];
-    weekdays.forEach(wd=>{row1.push(`${wd.name} ${wd.padDay}`);});
+    // 5. Build new row 1 headers: A1 stays, B1=PROGRAMAR, C1 onwards=weekdays
+    const newHeaders=[''];  // A1 keep empty
+    newHeaders.push('PROGRAMAR'); // B1
+    weekdays.forEach(wd=>newHeaders.push(`${wd.name} ${wd.padDay}`));
+    // Pad with empty to clear any extra old columns
+    while(newHeaders.length<totalExistingCols) newHeaders.push('');
 
-    // Build all rows
-    const allRows=[row1];
-    for(let s=0;s<SLOTS;s++){
-      for(let f=0;f<FIELDS.length;f++){
-        const row=[FIELDS[f].replace('_',' '),''];
-        // Empty cells for each weekday column
-        for(let w=0;w<weekdays.length;w++) row.push('');
-        allRows.push(row);
-      }
+    // 6. Clear all patient data (B2 onwards) but keep column A (field labels)
+    const SLOTS=5;
+    const totalRows=1+SLOTS*SLOT_HEIGHT;
+    const lastCol=colLetter(Math.max(totalExistingCols,newHeaders.length)-1);
+
+    // Build empty data rows (only from B onwards, A stays with its labels)
+    const emptyRows=[];
+    for(let r=0;r<totalRows;r++){
+      const row=[];
+      for(let c=1;c<Math.max(totalExistingCols,newHeaders.length);c++) row.push('');
+      emptyRows.push(row);
     }
 
-    // 4. Write all data
-    const lastCol=colLetter(totalCols-1);
-    await sheetsUpdate(CFG.sheetT,`'${tabName}'!A1:${lastCol}${totalRows}`,allRows);
+    // 7. Write: new headers in row 1, clear data from B2 down
+    await sheetsBatch(CFG.sheetT,[
+      {range:`'${tabName}'!A1:${lastCol}1`,values:[newHeaders]},
+      {range:`'${tabName}'!B2:${lastCol}${totalRows}`,values:emptyRows}
+    ]);
 
-    addLog(`Mes creado: ${tabName} (${weekdays.length} días hábiles)`);
-    toast(`${tabName} creado con ${weekdays.length} columnas ✓`);
+    // 8. Freeze first 2 columns and first row
+    await gapi.client.sheets.spreadsheets.batchUpdate({
+      spreadsheetId:CFG.sheetT,
+      resource:{requests:[{updateSheetProperties:{
+        properties:{sheetId:newSheetId,gridProperties:{frozenColumnCount:2,frozenRowCount:1}},
+        fields:'gridProperties.frozenColumnCount,gridProperties.frozenRowCount'
+      }}]}
+    });
 
-    // Switch to the new month
+    addLog(`Mes creado: ${tabName} (${weekdays.length} días hábiles, formato copiado)`);
+    toast(`${tabName} creado con formato ✓`);
     switchMonth(tabName);
   }catch(e){
     if(e.result&&e.result.error&&e.result.error.message.includes('already exists')){
-      toast('Esa pestaña ya existe. Usa otro nombre o cambia directamente.');
+      toast('Esa pestaña ya existe.');
     }else{
       toast('Error: '+(e.result?.error?.message||e.message||e));
     }
