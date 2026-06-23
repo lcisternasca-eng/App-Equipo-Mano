@@ -619,71 +619,141 @@ function openCreateMonth(){
 }
 
 async function createMonth(tabName,monthIdx,year){
-  toast('Creando pestaña con formato...');
+  toast('Creando pestaña con calendario y formato...');
   try{
-    // 1. Get current sheet's sheetId
+    // 1. Get source sheet for duplication (preserves fonts, label colors, column A format)
     const meta=await gapi.client.sheets.spreadsheets.get({spreadsheetId:CFG.sheetT});
     const currentSheet=meta.result.sheets.find(s=>s.properties.title===CFG.tabT);
     if(!currentSheet){toast('No se encontró la pestaña actual para copiar formato');return;}
-    const srcId=currentSheet.properties.sheetId;
 
-    // 2. Duplicate the sheet (copies all formatting, colors, fonts, column widths)
+    // 2. Duplicate to get base formatting
     const dupResult=await gapi.client.sheets.spreadsheets.batchUpdate({
       spreadsheetId:CFG.sheetT,
-      resource:{requests:[{duplicateSheet:{sourceSheetId:srcId,newSheetName:tabName}}]}
+      resource:{requests:[{duplicateSheet:{sourceSheetId:currentSheet.properties.sheetId,newSheetName:tabName}}]}
     });
     const newSheetId=dupResult.result.replies[0].duplicateSheet.properties.sheetId;
 
-    // 3. Calculate weekdays for the new month
+    // 3. Build calendar layout: weekdays + green separator between weeks
     const daysInMonth=new Date(year,monthIdx+1,0).getDate();
-    const weekdays=[];
+    const columns=[]; // {type:'day'|'sep', header:'', colIndex:N}
+    let lastWasFri=false;
     for(let d=1;d<=daysInMonth;d++){
-      const date=new Date(year,monthIdx,d);
-      const dow=date.getDay();
-      if(dow>=1&&dow<=5) weekdays.push({day:d,name:DIAS_SEMANA[dow],padDay:String(d).padStart(2,'0')});
+      const dow=new Date(year,monthIdx,d).getDay();
+      if(dow===1 && lastWasFri) columns.push({type:'sep',header:''}); // green separator before Monday
+      if(dow>=1&&dow<=5){
+        columns.push({type:'day',header:`${DIAS_SEMANA[dow]} ${String(d).padStart(2,'0')}`,day:d});
+        lastWasFri=(dow===5);
+      }
     }
 
-    // 4. Figure out how many data columns exist (from the duplicated sheet)
-    const existingHeaders=await sheetsGet(CFG.sheetT,`'${tabName}'!1:1`);
-    const totalExistingCols=existingHeaders[0]?existingHeaders[0].length:20;
-
-    // 5. Build new row 1 headers: A1 stays, B1=PROGRAMAR, C1 onwards=weekdays
-    const newHeaders=[''];  // A1 keep empty
-    newHeaders.push('PROGRAMAR'); // B1
-    weekdays.forEach(wd=>newHeaders.push(`${wd.name} ${wd.padDay}`));
-    // Pad with empty to clear any extra old columns
-    while(newHeaders.length<totalExistingCols) newHeaders.push('');
-
-    // 6. Clear all patient data (B2 onwards) but keep column A (field labels)
+    // 4. Build headers: A=labels, B=PROGRAMAR, then calendar columns
+    const totalCols=2+columns.length;
     const SLOTS=5;
     const totalRows=1+SLOTS*SLOT_HEIGHT;
-    const lastCol=colLetter(Math.max(totalExistingCols,newHeaders.length)-1);
 
-    // Build empty data rows (only from B onwards, A stays with its labels)
-    const emptyRows=[];
-    for(let r=0;r<totalRows;r++){
-      const row=[];
-      for(let c=1;c<Math.max(totalExistingCols,newHeaders.length);c++) row.push('');
-      emptyRows.push(row);
+    // Row 1 headers
+    const row1=['','PROGRAMAR'];
+    columns.forEach(c=>row1.push(c.header));
+
+    // All data rows (keep column A labels from duplicate, clear B onwards)
+    const dataRows=[];
+    for(let s=0;s<SLOTS;s++){
+      for(let f=0;f<FIELDS.length;f++){
+        const row=[FIELDS[f].replace('_',' ')];
+        for(let c=0;c<columns.length+1;c++) row.push('');
+        dataRows.push(row);
+      }
     }
 
-    // 7. Write: new headers in row 1, clear data from B2 down
-    await sheetsBatch(CFG.sheetT,[
-      {range:`'${tabName}'!A1:${lastCol}1`,values:[newHeaders]},
-      {range:`'${tabName}'!B2:${lastCol}${totalRows}`,values:emptyRows}
-    ]);
+    // 5. Pad to clear any extra columns from the duplicated sheet
+    const existHdr=await sheetsGet(CFG.sheetT,`'${tabName}'!1:1`);
+    const existCols=existHdr[0]?existHdr[0].length:0;
+    while(row1.length<existCols) row1.push('');
+    dataRows.forEach(r=>{while(r.length<existCols) r.push('');});
 
-    // 8. Freeze first 2 columns and first row
-    await gapi.client.sheets.spreadsheets.batchUpdate({
-      spreadsheetId:CFG.sheetT,
-      resource:{requests:[{updateSheetProperties:{
-        properties:{sheetId:newSheetId,gridProperties:{frozenColumnCount:2,frozenRowCount:1}},
-        fields:'gridProperties.frozenColumnCount,gridProperties.frozenRowCount'
-      }}]}
+    const lastCol=colLetter(Math.max(totalCols,existCols)-1);
+
+    // 6. Write headers + clean data
+    const allRows=[row1,...dataRows];
+    await sheetsUpdate(CFG.sheetT,`'${tabName}'!A1:${lastCol}${totalRows}`,allRows);
+
+    // 7. Format: freeze cols/rows + green separator columns
+    const formatRequests=[];
+    // Freeze
+    formatRequests.push({updateSheetProperties:{
+      properties:{sheetId:newSheetId,gridProperties:{frozenColumnCount:2,frozenRowCount:1}},
+      fields:'gridProperties.frozenColumnCount,gridProperties.frozenRowCount'
+    }});
+    // Green background on separator columns (full height)
+    columns.forEach((c,i)=>{
+      if(c.type==='sep'){
+        const colIdx=i+2; // +2 for A and B
+        formatRequests.push({repeatCell:{
+          range:{sheetId:newSheetId,startRowIndex:0,endRowIndex:totalRows,startColumnIndex:colIdx,endColumnIndex:colIdx+1},
+          cell:{userEnteredFormat:{backgroundColor:{red:0.85,green:0.93,blue:0.83}}},
+          fields:'userEnteredFormat.backgroundColor'
+        }});
+      }
+    });
+    // Bold + background for header row
+    formatRequests.push({repeatCell:{
+      range:{sheetId:newSheetId,startRowIndex:0,endRowIndex:1,startColumnIndex:0,endColumnIndex:totalCols},
+      cell:{userEnteredFormat:{textFormat:{bold:true},backgroundColor:{red:0.95,green:0.95,blue:0.0}}},
+      fields:'userEnteredFormat.textFormat.bold,userEnteredFormat.backgroundColor'
+    }});
+    // Set separator columns width to narrow (30px)
+    columns.forEach((c,i)=>{
+      if(c.type==='sep'){
+        formatRequests.push({updateDimensionProperties:{
+          range:{sheetId:newSheetId,dimension:'COLUMNS',startIndex:i+2,endIndex:i+3},
+          properties:{pixelSize:30},fields:'pixelSize'
+        }});
+      }
     });
 
-    addLog(`Mes creado: ${tabName} (${weekdays.length} días hábiles, formato copiado)`);
-    toast(`${tabName} creado con formato ✓`);
+    await gapi.client.sheets.spreadsheets.batchUpdate({spreadsheetId:CFG.sheetT,resource:{requests:formatRequests}});
+
+    // 8. Import pending patients from previous month
+    let pendingCount=0;
+    try{
+      const prevTab=CFG.tabT; // current month before switching
+      const prevRows=await sheetsGet(CFG.sheetT,`'${prevTab}'!A1:AZ200`);
+      const prevHeaders=prevRows[0]||[];
+      const pendingPatients=[];
+      prevHeaders.forEach((h,colIdx)=>{
+        if(!h||colIdx<2)return;
+        for(let slotStart=1;slotStart+SLOT_HEIGHT-1<prevRows.length;slotStart+=SLOT_HEIGHT){
+          const nombre=prevRows[slotStart+1]?prevRows[slotStart+1][colIdx]||'':'';
+          const comentario=prevRows[slotStart+14]?prevRows[slotStart+14][colIdx]||'':'';
+          if(nombre&&!comentario.toUpperCase().includes('OPERADO')&&!comentario.toUpperCase().includes('SUSPENDIDO')){
+            // Collect patient data
+            const fields={};
+            for(let f=0;f<FIELDS.length;f++){
+              fields[FIELDS[f]]=prevRows[slotStart+f]?prevRows[slotStart+f][colIdx]||'':'';
+            }
+            pendingPatients.push(fields);
+          }
+        }
+      });
+      // Write pending patients to PROGRAMAR column (B) of the new month
+      if(pendingPatients.length>0){
+        const batchData=[];
+        pendingPatients.forEach((p,idx)=>{
+          const slotStart=2+idx*SLOT_HEIGHT;
+          for(let f=0;f<FIELDS.length;f++){
+            batchData.push({range:`'${tabName}'!B${slotStart+f}`,values:[[p[FIELDS[f]]||'']]});
+          }
+        });
+        await sheetsBatch(CFG.sheetT,batchData);
+        pendingCount=pendingPatients.length;
+      }
+    }catch(e){console.log('No se pudieron importar pendientes:',e);}
+
+    const msg=pendingCount>0
+      ?`${tabName} creado ✓ — ${columns.filter(c=>c.type==='day').length} días hábiles, ${pendingCount} pendiente(s) importado(s)`
+      :`${tabName} creado ✓ — ${columns.filter(c=>c.type==='day').length} días hábiles`;
+    addLog(msg);
+    toast(msg);
     switchMonth(tabName);
   }catch(e){
     if(e.result&&e.result.error&&e.result.error.message.includes('already exists')){
