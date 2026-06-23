@@ -710,6 +710,17 @@ async function createMonth(tabName,monthIdx,year){
         }});
       }
     });
+    // Red block on first 2 slots of every Tuesday (equipo cadera)
+    columns.forEach((c,i)=>{
+      if(c.type==='day'&&c.header.startsWith('MARTES')){
+        const colIdx=i+2;
+        formatRequests.push({repeatCell:{
+          range:{sheetId:newSheetId,startRowIndex:1,endRowIndex:1+2*SLOT_HEIGHT,startColumnIndex:colIdx,endColumnIndex:colIdx+1},
+          cell:{userEnteredFormat:{backgroundColor:{red:0.91,green:0.6,blue:0.6}}},
+          fields:'userEnteredFormat.backgroundColor'
+        }});
+      }
+    });
 
     await gapi.client.sheets.spreadsheets.batchUpdate({spreadsheetId:CFG.sheetT,resource:{requests:formatRequests}});
 
@@ -984,10 +995,29 @@ async function returnToWaitlist(card){
   const dif=diferidosData.find(r=>r.rut&&r.rut.replace(/[.\-]/g,'')===rut.replace(/[.\-]/g,''));
   toast('Devolviendo...');
   try{
+    // Read patient data from tabla BEFORE clearing (in case we need to recreate in DIFERIDOS)
+    const patData=await sheetsGet(CFG.sheetT,`'${CFG.tabT}'!${col}${row}:${col}${row+14}`);
+    const pFields={};
+    for(let f=0;f<FIELDS.length;f++) pFields[FIELDS[f]]=patData[f]?patData[f][0]||'':'';
+
+    // Clear from tabla
     const empty=[];for(let i=0;i<15;i++)empty.push(['']);
     await sheetsUpdate(CFG.sheetT,`'${CFG.tabT}'!${col}${row}:${col}${row+14}`,empty);
-    if(dif)await sheetsUpdate(CFG.sheetD,`'${CFG.tabD}'!${DCOL.AL}${dif.ri}`,[['PROGRAMAR']]);
-    addLog(`Devuelto ${dif?dif.nombre:rut} a lista`);toast('Devuelto ✓');
+
+    if(dif){
+      // Patient exists in DIFERIDOS — just set back to PROGRAMAR
+      await sheetsUpdate(CFG.sheetD,`'${CFG.tabD}'!${DCOL.AL}${dif.ri}`,[['PROGRAMAR']]);
+    } else if(pFields.NOMBRE){
+      // Patient NOT in DIFERIDOS — create new entry so they don't disappear
+      const existing=await sheetsGet(CFG.sheetD,`'${CFG.tabD}'!B:B`);
+      const nextRow=existing.length+1;
+      const newRow=['PROGRAMAR',`=IF(ISBLANK(L${nextRow}); ""; TODAY()-L${nextRow})`,
+        pFields.RUT||'',pFields.NOMBRE||'',pFields.EDAD||'',pFields.DG||'',
+        pFields.LATERALIDAD||'','','MEDIA',new Date().toLocaleDateString('es-CL'),
+        '','','',pFields.LATERALIDAD||''];
+      await sheetsUpdate(CFG.sheetD,`'${CFG.tabD}'!B${nextRow}:O${nextRow}`,[newRow]);
+    }
+    addLog(`Devuelto ${pFields.NOMBRE||rut} a lista`);toast('Devuelto a lista ✓');
     await loadDiferidos();await loadKanban();
   }catch(e){toast('Error: '+(e.message||e));}
 }
