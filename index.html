@@ -562,18 +562,24 @@ async function uploadImageToDrive(file,rut){
   return data;
 }
 
-async function saveImageRef(rut,fileId,fileName){
-  // Store in "Imagenes" tab of DIFERIDOS sheet
+async function ensureImagenesTab(){
   try{
-    await sheetsAppend(CFG.sheetD,`'Imagenes'!A:D`,[rut,fileId,fileName,new Date().toLocaleDateString('es-CL')]);
+    await sheetsGet(CFG.sheetD,`'Imagenes'!A1`);
   }catch(e){
-    // Tab might not exist — create it
     try{
       await gapi.client.sheets.spreadsheets.batchUpdate({spreadsheetId:CFG.sheetD,resource:{requests:[{addSheet:{properties:{title:'Imagenes'}}}]}});
       await sheetsUpdate(CFG.sheetD,`'Imagenes'!A1:D1`,[['RUT','FileID','Archivo','Fecha']]);
-      await sheetsAppend(CFG.sheetD,`'Imagenes'!A:D`,[rut,fileId,fileName,new Date().toLocaleDateString('es-CL')]);
-    }catch(e2){console.log('Error creating Imagenes tab:',e2);}
+    }catch(e2){console.log('Imagenes tab may already exist:',e2);}
   }
+}
+
+async function saveImageRef(rut,fileId,fileName){
+  await ensureImagenesTab();
+  try{
+    const existing=await sheetsGet(CFG.sheetD,`'Imagenes'!A:A`);
+    const nextRow=existing.length+1;
+    await sheetsUpdate(CFG.sheetD,`'Imagenes'!A${nextRow}:D${nextRow}`,[[rut,fileId,fileName,new Date().toLocaleDateString('es-CL')]]);
+  }catch(e){console.log('Error saving image ref:',e);}
 }
 
 async function getImageRefs(rut){
@@ -971,6 +977,7 @@ async function loadKanban(){
       }
       kanbanCols.push({header:h.trim(),colIdx,colLetter:colLetter(colIdx),slots});
     });
+    await loadImageCounts();
     renderBoard();
     loadInsumosPresets(); // preload presets in background
     setSB('sb-kanban','ok',`${kanbanCols.length} pabellones · ${kanbanCols.reduce((s,c)=>s+c.slots.length,0)} cirugías`);
