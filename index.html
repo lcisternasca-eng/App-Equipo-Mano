@@ -128,6 +128,10 @@ tr:hover td{background:var(--bg)}
 .info-grid strong{display:block;font-size:10px;color:var(--text-2);font-weight:500;margin-bottom:1px}
 /* UPLOAD */
 .uz{border:1.5px dashed var(--border-mid);border-radius:var(--r);padding:14px;text-align:center;cursor:pointer}
+.tag-grid{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px}
+.tag-btn{padding:4px 10px;border-radius:16px;font-size:11px;border:0.5px solid var(--border-mid);background:var(--surface);color:var(--text-2);cursor:pointer;transition:all .15s}
+.tag-btn:hover{border-color:var(--blue);color:var(--blue)}
+.tag-btn.selected{background:var(--blue);border-color:var(--blue);color:#fff}
 .uz:hover{background:var(--bg)}
 .uz p{font-size:12px;color:var(--text-2);margin-top:4px}
 .prev-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
@@ -322,13 +326,19 @@ tr:hover td{background:var(--bg)}
           <select id="prog-turno"><option>1°</option><option>2°</option><option>3°</option><option>4°</option><option>5°</option><option>6°</option><option>Condicional</option></select>
         </div>
         <div class="fg"><label>Procedencia</label><select id="prog-proc"><option>AMB</option><option>HOSP</option><option>URG</option></select></div>
-        <div class="fg" style="grid-column:1/-1"><label>Cirugía (CX) — seleccionar preset o escribir *</label>
-          <select id="prog-cx-preset" onchange="applyCxPreset()" style="margin-bottom:4px"><option value="">— Escribir manualmente —</option></select>
-          <input type="text" id="prog-cx" placeholder="Ej: Red y OTS, Artrodesis MCF..."/>
+        <div class="fg" style="grid-column:1/-1"><label>Cirugía (CX) — insumos predeterminados</label>
+          <select id="prog-cx-preset" onchange="applyCxPreset()" style="margin-bottom:4px"><option value="">— Seleccionar para cargar insumos —</option></select>
+        </div>
+        <div class="fg" style="grid-column:1/-1"><label>Procedimiento(s) *</label>
+          <div class="tag-grid" id="cx-tags"></div>
+          <input type="text" id="prog-cx" placeholder="Texto final editable..."/>
         </div>
         <div class="fg"><label>Tiempo CX (min) *</label><input type="number" id="prog-tiempo" placeholder="90"/></div>
-        <div class="fg"><label>Anestesia *</label><select id="prog-an"><option>Regional</option><option>General</option><option>Local + sedación</option><option>Local</option><option>TIVA</option></select></div>
-        <div class="fg" style="grid-column:1/-1"><label>Cirujanos *</label><input type="text" id="prog-cir" placeholder="Ej: García / Rojas"/></div>
+        <div class="fg"><label>Anestesia *</label><select id="prog-an"><option>General</option><option>Regional</option><option>Troncular</option><option>Regional + Sedación</option><option>Troncular + Sedación</option><option>WALANT</option><option>WALANT + Sedación</option></select></div>
+        <div class="fg" style="grid-column:1/-1"><label>Cirujanos *</label>
+          <div class="tag-grid" id="cir-tags"></div>
+          <input type="text" id="prog-cir" placeholder="Selecciona arriba o escribe..."/>
+        </div>
         <div class="fg" style="grid-column:1/-1"><label>Insumos *</label><textarea id="prog-ins" placeholder="Implantes, materiales especiales..." rows="3"></textarea></div>
         <div class="fg"><label>Código</label><input type="text" id="prog-cod"/></div>
         <div class="fg"><label>Biopsia</label><select id="prog-bio"><option>No</option><option>Sí</option></select></div>
@@ -916,9 +926,26 @@ async function loadInsumosPresets(){
     }
   }catch(e){console.log('No se pudo cargar hoja Insumos:',e);}
 }
+const CX_OPTIONS=['Red + OTS','Fijación Externa','Aseo quirúrgico','Colgajo','Tumorectomía','Amputación','Artrodesis','Artroplastía'];
+const CIR_OPTIONS=['Dr. Grau','Dr. Fuentes','Dr. Rios','Dr. Escudero','Dr. Salviat','Dra. Proboste','Dr. Cisternas'];
+
+function renderTagButtons(containerId,options,inputId,suffix){
+  const container=document.getElementById(containerId);
+  container.innerHTML=options.map(o=>`<span class="tag-btn" data-val="${o}" onclick="toggleTag(this,'${inputId}','${suffix||''}')">${o}</span>`).join('');
+}
+function toggleTag(btn,inputId,suffix){
+  btn.classList.toggle('selected');
+  updateTagInput(btn.closest('.tag-grid'),inputId,suffix);
+}
+function updateTagInput(container,inputId,suffix){
+  const selected=[...container.querySelectorAll('.tag-btn.selected')].map(b=>b.dataset.val);
+  const text=selected.join(' + ')+(suffix&&selected.length?' - '+suffix:'');
+  document.getElementById(inputId).value=text;
+}
+
 function populateCxPresets(){
   const sel=document.getElementById('prog-cx-preset');
-  sel.innerHTML='<option value="">— Escribir manualmente —</option>';
+  sel.innerHTML='<option value="">— Seleccionar para cargar insumos —</option>';
   insumosPresets.forEach((p,i)=>{sel.innerHTML+=`<option value="${i}">${p.nombre}</option>`;});
 }
 function applyCxPreset(){
@@ -926,7 +953,6 @@ function applyCxPreset(){
   if(idx==='')return;
   const preset=insumosPresets[parseInt(idx)];
   if(!preset)return;
-  document.getElementById('prog-cx').value=preset.nombre;
   document.getElementById('prog-ins').value=preset.insumos;
 }
 
@@ -943,6 +969,8 @@ function showProgramarModal(card,targetBody){
   document.getElementById('prog-cx-preset').value='';
   const nextTurno=targetCol?(targetCol.slots.length+1):1;
   document.getElementById('prog-turno').value=nextTurno<=6?nextTurno+'°':'Condicional';
+  renderTagButtons('cx-tags',CX_OPTIONS,'prog-cx','');
+  renderTagButtons('cir-tags',CIR_OPTIONS,'prog-cir','Becados');
   populateCxPresets();
   openM('modal-programar');
 }
