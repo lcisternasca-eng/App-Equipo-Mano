@@ -493,6 +493,19 @@ const sheetsBatch=(id,data)=>gapi.client.sheets.spreadsheets.values.batchUpdate(
 const sheetsUpdate=(id,range,vals)=>gapi.client.sheets.spreadsheets.values.update({spreadsheetId:id,range,valueInputOption:'USER_ENTERED',resource:{values:vals}});
 const sheetsAppend=(id,range,vals)=>gapi.client.sheets.spreadsheets.values.append({spreadsheetId:id,range,valueInputOption:'USER_ENTERED',insertDataOption:'INSERT_ROWS',resource:{values:[vals]}});
 
+async function applyCellFormat(spreadsheetId,tabName,startRow,endRow,startCol,endCol){
+  try{
+    const meta=await gapi.client.sheets.spreadsheets.get({spreadsheetId});
+    const sheet=meta.result.sheets.find(s=>s.properties.title===tabName);
+    if(!sheet)return;
+    await gapi.client.sheets.spreadsheets.batchUpdate({spreadsheetId,resource:{requests:[{repeatCell:{
+      range:{sheetId:sheet.properties.sheetId,startRowIndex:startRow,endRowIndex:endRow,startColumnIndex:startCol,endColumnIndex:endCol},
+      cell:{userEnteredFormat:{horizontalAlignment:'CENTER',wrapStrategy:'WRAP'}},
+      fields:'userEnteredFormat.horizontalAlignment,userEnteredFormat.wrapStrategy'
+    }}]}});
+  }catch(e){console.log('Format error:',e);}
+}
+
 // ==================== DIFERIDOS ====================
 let diferidosData=[];
 async function loadDiferidos(){
@@ -732,6 +745,12 @@ async function createMonth(tabName,monthIdx,year){
         }});
       }
     });
+    // Center alignment + text wrap for all data cells
+    formatRequests.push({repeatCell:{
+      range:{sheetId:newSheetId,startRowIndex:1,endRowIndex:totalRows,startColumnIndex:0,endColumnIndex:totalCols},
+      cell:{userEnteredFormat:{horizontalAlignment:'CENTER',wrapStrategy:'WRAP'}},
+      fields:'userEnteredFormat.horizontalAlignment,userEnteredFormat.wrapStrategy'
+    }});
 
     await gapi.client.sheets.spreadsheets.batchUpdate({spreadsheetId:CFG.sheetT,resource:{requests:formatRequests}});
 
@@ -949,6 +968,10 @@ async function swapSlots(colLetter,rowA,rowB){
       valsA.push([dataA[i]?(dataA[i][0]||''):'']);
       valsB.push([dataB[i]?(dataB[i][0]||''):'']);
     }
+    // Swap data but keep HORA (index 0) based on position, not patient
+    const turnoA=valsA[0][0];const turnoB=valsB[0][0];
+    valsA[0][0]=turnoB; // A's data goes to B's position, gets B's turn
+    valsB[0][0]=turnoA; // B's data goes to A's position, gets A's turn
     await sheetsBatch(CFG.sheetT,[
       {range:`'${CFG.tabT}'!${colLetter}${rowA}:${colLetter}${rowA+14}`,values:valsB},
       {range:`'${CFG.tabT}'!${colLetter}${rowB}:${colLetter}${rowB+14}`,values:valsA}
@@ -1043,6 +1066,8 @@ async function confirmarProgramar(){
   toast('Agendando...');
   try{
     await sheetsUpdate(CFG.sheetT,`'${CFG.tabT}'!${colLetter}${slotStart}:${colLetter}${slotStart+14}`,values);
+    // Apply center + wrap formatting to the written cells
+    await applyCellFormat(CFG.sheetT,CFG.tabT,slotStart-1,slotStart+14,colIdx,colIdx+1);
     await sheetsUpdate(CFG.sheetD,`'${CFG.tabD}'!${DCOL.AL}${p.ri}`,[['EN TABLA']]);
     addLog(`Programado ${p.nombre} → ${targetCol?targetCol.header:colLetter}`);
     toast(`${p.nombre} agendado ✓`);
