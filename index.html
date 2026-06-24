@@ -326,6 +326,7 @@ tr:hover td{background:var(--bg)}
           <select id="prog-turno"><option>1°</option><option>2°</option><option>3°</option><option>4°</option><option>5°</option><option>6°</option><option>Condicional</option></select>
         </div>
         <div class="fg"><label>Procedencia</label><select id="prog-proc"><option>AMB</option><option>HOSP</option><option>URG</option></select></div>
+        <div class="fg"><label>Lateralidad *</label><select id="prog-lat"><option value="Derecho">Derecho</option><option value="Izquierdo">Izquierdo</option><option value="Bilateral">Bilateral</option></select></div>
         <div class="fg" style="grid-column:1/-1"><label>Cirugía (CX) — insumos predeterminados</label>
           <select id="prog-cx-preset" onchange="applyCxPreset()" style="margin-bottom:4px"><option value="">— Seleccionar para cargar insumos —</option></select>
         </div>
@@ -901,15 +902,62 @@ function setupDragDrop(){
   document.querySelectorAll('.kcol-body,.kb-fixed-body').forEach(body=>{
     body.addEventListener('dragover',e=>{e.preventDefault();e.dataTransfer.dropEffect='move';body.classList.add('dragover');});
     body.addEventListener('dragleave',()=>body.classList.remove('dragover'));
-    body.addEventListener('drop',e=>{e.preventDefault();body.classList.remove('dragover');if(!dragSrc)return;handleDrop(dragSrc,body);});
+    body.addEventListener('drop',e=>{e.preventDefault();body.classList.remove('dragover');if(!dragSrc)return;handleDrop(dragSrc,body,e);});
   });
 }
 
-async function handleDrop(card,targetBody){
+async function handleDrop(card,targetBody,evt){
   const srcType=card.dataset.src;const tgtType=targetBody.dataset.drop;
   if(tgtType==='waitlist'&&srcType==='kanban'){if(!confirm('¿Devolver a lista de espera?'))return;await returnToWaitlist(card);return;}
   if(tgtType==='col'&&srcType==='waitlist'){showProgramarModal(card,targetBody);return;}
-  if(tgtType==='col'&&srcType==='kanban'){const sameCol=card.dataset.col===targetBody.dataset.colLetter;if(sameCol)return;await moveBetweenColumns(card,targetBody);return;}
+  if(tgtType==='col'&&srcType==='kanban'){
+    const sameCol=card.dataset.col===targetBody.dataset.colLetter;
+    if(sameCol){
+      // Find which card we dropped on
+      const cards=[...targetBody.querySelectorAll('.kcard')].filter(c=>c!==card);
+      let targetCard=null;
+      if(evt){
+        for(const c of cards){
+          const rect=c.getBoundingClientRect();
+          if(evt.clientY>=rect.top&&evt.clientY<=rect.bottom){targetCard=c;break;}
+        }
+        if(!targetCard&&cards.length>0){
+          // Dropped above or below all cards — find nearest
+          targetCard=cards.reduce((nearest,c)=>{
+            const rect=c.getBoundingClientRect();
+            const dist=Math.abs(evt.clientY-(rect.top+rect.height/2));
+            return dist<nearest.dist?{card:c,dist}:nearest;
+          },{card:cards[0],dist:Infinity}).card;
+        }
+      }
+      if(targetCard&&targetCard.dataset.rowStart!==card.dataset.rowStart){
+        await swapSlots(card.dataset.col,parseInt(card.dataset.rowStart),parseInt(targetCard.dataset.rowStart));
+      }
+      return;
+    }
+    await moveBetweenColumns(card,targetBody);return;
+  }
+}
+
+async function swapSlots(colLetter,rowA,rowB){
+  toast('Intercambiando turnos...');
+  try{
+    const dataA=await sheetsGet(CFG.sheetT,`'${CFG.tabT}'!${colLetter}${rowA}:${colLetter}${rowA+14}`);
+    const dataB=await sheetsGet(CFG.sheetT,`'${CFG.tabT}'!${colLetter}${rowB}:${colLetter}${rowB+14}`);
+    const valsA=[];const valsB=[];
+    for(let i=0;i<15;i++){
+      valsA.push([dataA[i]?(dataA[i][0]||''):'']);
+      valsB.push([dataB[i]?(dataB[i][0]||''):'']);
+    }
+    await sheetsBatch(CFG.sheetT,[
+      {range:`'${CFG.tabT}'!${colLetter}${rowA}:${colLetter}${rowA+14}`,values:valsB},
+      {range:`'${CFG.tabT}'!${colLetter}${rowB}:${colLetter}${rowB+14}`,values:valsA}
+    ]);
+    const nameA=valsA[1][0]||'?';const nameB=valsB[1][0]||'?';
+    addLog(`Intercambiados: ${nameA} ↔ ${nameB}`);
+    toast(`${nameA} ↔ ${nameB} ✓`);
+    await loadKanban();
+  }catch(e){toast('Error: '+(e.message||e));}
 }
 
 // ==================== INSUMOS PRESETS ====================
@@ -971,6 +1019,8 @@ function showProgramarModal(card,targetBody){
   document.getElementById('prog-turno').value=nextTurno<=6?nextTurno+'°':'Condicional';
   renderTagButtons('cx-tags',CX_OPTIONS,'prog-cx','');
   renderTagButtons('cir-tags',CIR_OPTIONS,'prog-cir','Becados');
+  // Pre-select lateralidad from patient data
+  if(p.lat) document.getElementById('prog-lat').value=p.lat;
   populateCxPresets();
   openM('modal-programar');
 }
@@ -989,7 +1039,7 @@ async function confirmarProgramar(){
   // Find first empty slot
   let slotStart=2;
   if(targetCol)while(targetCol.slots.find(s=>s.rowStart===slotStart))slotStart+=SLOT_HEIGHT;
-  const values=[[turno],[p.nombre],[p.rut],[p.edad],[document.getElementById('prog-proc').value],[p.dx],[p.lat],[cx],[document.getElementById('prog-cod').value],[tiempo],[an],[cir],[ins],[document.getElementById('prog-bio').value],[document.getElementById('prog-com').value]];
+  const values=[[turno],[p.nombre],[p.rut],[p.edad],[document.getElementById('prog-proc').value],[p.dx],[document.getElementById('prog-lat').value],[cx],[document.getElementById('prog-cod').value],[tiempo],[an],[cir],[ins],[document.getElementById('prog-bio').value],[document.getElementById('prog-com').value]];
   toast('Agendando...');
   try{
     await sheetsUpdate(CFG.sheetT,`'${CFG.tabT}'!${colLetter}${slotStart}:${colLetter}${slotStart+14}`,values);
