@@ -162,10 +162,35 @@ tr:hover td{background:var(--bg)}
 .cfg-hd{padding:11px 16px;border-bottom:0.5px solid var(--border);font-size:13px;font-weight:500;background:var(--bg)}
 .cfg-bd{padding:16px}
 /* IMG VIEWER */
-#viewer{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:300;align-items:center;justify-content:center}
+#viewer{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:300;align-items:center;justify-content:center;flex-direction:column}
 #viewer.open{display:flex}
-#viewer img{max-width:90vw;max-height:90vh;border-radius:8px}
+#viewer img{max-width:88vw;max-height:80vh;border-radius:8px;object-fit:contain}
 #viewer .vc{position:fixed;top:20px;right:24px;background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:50%;width:36px;height:36px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+#viewer .v-nav{position:fixed;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:50%;width:44px;height:44px;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+#viewer .v-nav:hover{background:rgba(255,255,255,.3)}
+#viewer .v-prev{left:16px}
+#viewer .v-next{right:16px}
+#viewer .v-counter{position:fixed;bottom:24px;color:rgba(255,255,255,.7);font-size:13px}
+/* STATS */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.stat-big{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--rl);padding:18px;text-align:center}
+.stat-big .sv{font-size:32px;font-weight:500;margin-bottom:2px}
+.stat-big .sl{font-size:12px;color:var(--text-2)}
+.chart-card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--rl);padding:18px;margin-bottom:16px}
+.chart-title{font-size:14px;font-weight:500;margin-bottom:14px}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.bar-label{font-size:12px;color:var(--text-2);width:120px;text-align:right;flex-shrink:0}
+.bar-track{flex:1;height:22px;background:var(--bg);border-radius:4px;overflow:hidden;position:relative}
+.bar-fill{height:100%;border-radius:4px;display:flex;align-items:center;padding:0 8px;font-size:11px;color:#fff;font-weight:500;min-width:28px;transition:width .4s}
+.bar-fill.blue{background:var(--blue)}
+.bar-fill.green{background:var(--green)}
+.bar-fill.amber{background:#D4890A}
+.bar-fill.red{background:#C74545}
+.monthly-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(60px,1fr));gap:6px;align-items:end;height:120px}
+.month-bar{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}
+.month-bar-fill{width:100%;background:var(--blue);border-radius:4px 4px 0 0;min-height:4px;transition:height .4s}
+.month-bar-val{font-size:11px;font-weight:500;margin-bottom:2px}
+.month-bar-label{font-size:10px;color:var(--text-2);margin-top:4px}
 .rx-badge{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:4px;font-size:10px;cursor:pointer;background:#2c2c2a;color:#888}
 .rx-badge.has{background:var(--blue-d);color:#fff}
 .rx-badge:hover{opacity:.8}
@@ -209,6 +234,11 @@ tr:hover td{background:var(--bg)}
         <div class="nav-item" data-view="kanban" onclick="navTo(this)">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="6" height="18" rx="1"/><rect x="11" y="3" width="6" height="13" rx="1"/></svg>
           Tablero kanban
+        </div>
+        <div class="nav-section">Análisis</div>
+        <div class="nav-item" data-view="stats" onclick="navTo(this)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+          Estadísticas
         </div>
         <div class="nav-section">Sistema</div>
         <div class="nav-item" data-view="config" onclick="navTo(this)">
@@ -277,6 +307,41 @@ tr:hover td{background:var(--bg)}
           </div>
           <div id="sb-kanban" class="sbar load" style="margin:10px 16px"><span class="dot a"></span><span>Cargando tablero...</span><span class="spin" style="margin-left:auto"></span></div>
           <div class="kb-wrapper" id="kb-wrapper"></div>
+        </div>
+        <!-- STATS -->
+        <div id="view-stats" class="vp" style="display:none">
+          <div id="sb-stats" class="sbar load"><span class="dot a"></span><span>Calculando...</span><span class="spin" style="margin-left:auto"></span></div>
+          <div class="stat-grid" id="stats-big"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <div class="chart-card">
+              <div class="chart-title">Pacientes por mes (últimos 6 meses)</div>
+              <div id="chart-monthly"></div>
+            </div>
+            <div class="chart-card">
+              <div class="chart-title">Operados vs Suspendidos por mes</div>
+              <div id="chart-outcomes"></div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <div class="chart-card">
+              <div class="chart-title">Top diagnósticos</div>
+              <div id="chart-dx"></div>
+            </div>
+            <div class="chart-card">
+              <div class="chart-title">Cirugías por cirujano</div>
+              <div id="chart-cir"></div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <div class="chart-card">
+              <div class="chart-title">Distribución por prioridad</div>
+              <div id="chart-prio"></div>
+            </div>
+            <div class="chart-card">
+              <div class="chart-title">Tiempo de espera promedio (días)</div>
+              <div id="chart-wait"></div>
+            </div>
+          </div>
         </div>
         <!-- CONFIG -->
         <div id="view-config" class="vp" style="display:none">
@@ -434,8 +499,14 @@ tr:hover td{background:var(--bg)}
   </div>
 </div>
 
-<!-- IMG VIEWER -->
-<div id="viewer" onclick="this.classList.remove('open')"><button class="vc">✕</button><img id="viewer-img" src="" alt="RX"/></div>
+<!-- IMG VIEWER with navigation -->
+<div id="viewer" onclick="if(event.target===this)closeViewer()">
+  <button class="vc" onclick="closeViewer()">✕</button>
+  <button class="v-nav v-prev" onclick="event.stopPropagation();viewerNav(-1)">‹</button>
+  <img id="viewer-img" src="" alt="RX"/>
+  <button class="v-nav v-next" onclick="event.stopPropagation();viewerNav(1)">›</button>
+  <div class="v-counter" id="viewer-counter"></div>
+</div>
 <!-- DRAWER -->
 <div class="drawer-bg" id="drawer-bg" onclick="closeDrawer()"></div>
 <div class="drawer" id="drawer">
@@ -470,7 +541,7 @@ function colLetter(n){let s='';while(n>=0){s=String.fromCharCode(65+n%26)+s;n=Ma
 function fmtDateCL(isoStr){if(!isoStr)return '';const d=new Date(isoStr+'T12:00:00');return d.toLocaleDateString('es-CL');}
 
 // ==================== NAV ====================
-const topMap={lista:{t:'Lista de espera (DIFERIDOS)',a:''},kanban:{t:'Tablero quirúrgico',a:''},config:{t:'Configuración',a:''}};
+const topMap={lista:{t:'Lista de espera (DIFERIDOS)',a:''},kanban:{t:'Tablero quirúrgico',a:''},stats:{t:'Estadísticas',a:''},config:{t:'Configuración',a:''}};
 function navTo(el){
   const v=el.dataset.view;
   document.querySelectorAll('.vp').forEach(p=>p.style.display='none');
@@ -480,7 +551,7 @@ function navTo(el){
   el.classList.add('active');
   document.getElementById('view-title').textContent=topMap[v].t;
   document.getElementById('content-container').className='content'+(v==='kanban'?' kanban':'');
-  if(v==='lista')loadDiferidos();if(v==='kanban')loadKanban();
+  if(v==='lista')loadDiferidos();if(v==='kanban')loadKanban();if(v==='stats')loadStats();
 }
 
 // ==================== GOOGLE AUTH ====================
@@ -620,6 +691,7 @@ function imgCountForRut(rut){return imgCounts[(rut||'').replace(/[.\-]/g,'')]||0
 
 // Gallery
 let galleryRut='';
+let viewerImages=[],viewerIdx=0;
 async function openGallery(rut,nombre){
   galleryRut=rut;
   document.getElementById('gallery-title').textContent=`Radiografías — ${nombre||rut}`;
@@ -627,10 +699,33 @@ async function openGallery(rut,nombre){
   document.getElementById('gallery-grid').innerHTML='<div class="gallery-empty">Cargando imágenes...</div>';
   openM('modal-gallery');
   const refs=await getImageRefs(rut);
+  viewerImages=refs.map(r=>({url:driveThumbUrl(r.fileId).replace('=w400','=w1200'),thumb:driveThumbUrl(r.fileId),name:r.name,fecha:r.fecha,driveUrl:driveViewUrl(r.fileId)}));
   document.getElementById('gallery-count').textContent=`${refs.length} imagen(es)`;
   if(!refs.length){document.getElementById('gallery-grid').innerHTML='<div class="gallery-empty">Sin radiografías. Usa el botón "Subir más RX" para agregar.</div>';return;}
-  document.getElementById('gallery-grid').innerHTML=refs.map(r=>`<img src="${driveThumbUrl(r.fileId)}" onclick="window.open('${driveViewUrl(r.fileId)}','_blank')" title="${r.name} — ${r.fecha}"/>`).join('');
+  document.getElementById('gallery-grid').innerHTML=refs.map((r,i)=>`<img src="${driveThumbUrl(r.fileId)}" onclick="openViewer(${i})" title="${r.name} — ${r.fecha}"/>`).join('');
 }
+function openViewer(idx){
+  viewerIdx=idx;
+  updateViewer();
+  document.getElementById('viewer').classList.add('open');
+}
+function updateViewer(){
+  if(!viewerImages.length)return;
+  const img=viewerImages[viewerIdx];
+  document.getElementById('viewer-img').src=img.url;
+  document.getElementById('viewer-counter').textContent=`${viewerIdx+1} / ${viewerImages.length}  —  ${img.name||''}`;
+}
+function viewerNav(dir){
+  viewerIdx=(viewerIdx+dir+viewerImages.length)%viewerImages.length;
+  updateViewer();
+}
+function closeViewer(){document.getElementById('viewer').classList.remove('open');}
+document.addEventListener('keydown',e=>{
+  if(!document.getElementById('viewer').classList.contains('open'))return;
+  if(e.key==='ArrowLeft')viewerNav(-1);
+  if(e.key==='ArrowRight')viewerNav(1);
+  if(e.key==='Escape')closeViewer();
+});
 
 async function uploadGalleryImages(evt){
   if(!galleryRut){toast('Sin paciente seleccionado');return;}
@@ -1415,6 +1510,98 @@ function renderLog(){
   if(!log.length){ll.innerHTML='<div class="empty-s">Sin cambios aún.</div>';return;}
   ll.innerHTML=log.map(e=>{const d=new Date(e.ts);return `<div class="log-item"><div class="log-time">${d.toLocaleDateString('es-CL')} ${d.toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'})} · ${e.user}</div><div>${e.text}</div></div>`;}).join('');
 }
+
+// ==================== STATISTICS ====================
+async function loadStats(){
+  setSB('sb-stats','load','Calculando estadísticas...');
+  if(!diferidosData.length)await loadDiferidos();
+  try{
+    const data=diferidosData;
+    const now=new Date();const curM=now.getMonth();const curY=now.getFullYear();
+
+    // Big stats
+    const total=data.length;
+    const programar=data.filter(r=>r.al==='PROGRAMAR').length;
+    const enTabla=data.filter(r=>r.al==='EN TABLA').length;
+    const operados=data.filter(r=>r.al==='OPERADO').length;
+    const altaPrio=data.filter(r=>r.prio==='ALTA'&&(r.al==='PROGRAMAR'||r.al==='EN TABLA')).length;
+    const diasArr=data.filter(r=>r.al==='PROGRAMAR'&&r.dias).map(r=>parseInt(r.dias)).filter(d=>!isNaN(d));
+    const promDias=diasArr.length?Math.round(diasArr.reduce((a,b)=>a+b,0)/diasArr.length):0;
+
+    document.getElementById('stats-big').innerHTML=`
+      <div class="stat-big"><div class="sv">${total}</div><div class="sl">Total registrados</div></div>
+      <div class="stat-big"><div class="sv" style="color:var(--amber-d)">${programar}</div><div class="sl">En espera</div></div>
+      <div class="stat-big"><div class="sv" style="color:var(--green)">${enTabla}</div><div class="sl">En tabla</div></div>
+      <div class="stat-big"><div class="sv" style="color:var(--blue-d)">${operados}</div><div class="sl">Operados</div></div>
+      <div class="stat-big"><div class="sv" style="color:var(--red-d)">${altaPrio}</div><div class="sl">Prioridad ALTA pendientes</div></div>
+      <div class="stat-big"><div class="sv" style="color:var(--amber-d)">${promDias}d</div><div class="sl">Espera promedio</div></div>
+      <div class="stat-big"><div class="sv">${diasArr.length?Math.max(...diasArr):0}d</div><div class="sl">Mayor espera</div></div>
+      <div class="stat-big"><div class="sv">${imgCountTotal()}</div><div class="sl">Radiografías</div></div>`;
+
+    // Monthly chart - operados por mes (from F_CX dates)
+    const monthlyOp={};const monthlySusp={};const monthlyIng={};
+    for(let i=5;i>=0;i--){
+      const m=(curM-i+12)%12;const y=curY+Math.floor((curM-i)/12);
+      const key=`${MONTHS[m].substring(0,3)} ${y}`;
+      monthlyOp[key]=0;monthlySusp[key]=0;monthlyIng[key]=0;
+    }
+    data.forEach(r=>{
+      // Operados by F_CX
+      if(r.f_cx){const p=r.f_cx.split('/');if(p.length>=3){const d=new Date(parseInt(p[2]),parseInt(p[1])-1,parseInt(p[0]));const k=`${MONTHS[d.getMonth()].substring(0,3)} ${d.getFullYear()}`;if(k in monthlyOp)monthlyOp[k]++;}}
+      // Ingresos by F_INGRESO
+      if(r.f_ingreso){const p=r.f_ingreso.split('/');if(p.length>=3){const d=new Date(parseInt(p[2]),parseInt(p[1])-1,parseInt(p[0]));const k=`${MONTHS[d.getMonth()].substring(0,3)} ${d.getFullYear()}`;if(k in monthlyIng)monthlyIng[k]++;}}
+      // Suspendidos (check comments)
+      if(r.com&&r.com.toUpperCase().includes('SUSPENDIDO')){
+        // Try to find date from comment
+        const match=r.com.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+        if(match){const d=new Date(parseInt(match[3]),parseInt(match[2])-1,parseInt(match[1]));const k=`${MONTHS[d.getMonth()].substring(0,3)} ${d.getFullYear()}`;if(k in monthlySusp)monthlySusp[k]++;}
+      }
+    });
+
+    const maxMonthly=Math.max(...Object.values(monthlyIng),...Object.values(monthlyOp),1);
+    document.getElementById('chart-monthly').innerHTML=`<div class="monthly-grid">${Object.keys(monthlyIng).map(k=>`<div class="month-bar"><div class="month-bar-val">${monthlyIng[k]}</div><div class="month-bar-fill" style="height:${Math.max(monthlyIng[k]/maxMonthly*100,5)}%;background:var(--blue)"></div><div class="month-bar-label">${k}</div></div>`).join('')}</div>`;
+
+    const maxOut=Math.max(...Object.values(monthlyOp),...Object.values(monthlySusp),1);
+    document.getElementById('chart-outcomes').innerHTML=`<div style="display:flex;gap:4px;margin-bottom:8px"><span style="font-size:11px;color:var(--green)">■ Operados</span><span style="font-size:11px;color:var(--red-d)">■ Suspendidos</span></div><div class="monthly-grid">${Object.keys(monthlyOp).map(k=>`<div class="month-bar"><div class="month-bar-val" style="font-size:10px">${monthlyOp[k]}/${monthlySusp[k]}</div><div style="width:100%;display:flex;gap:2px;align-items:flex-end;height:100%"><div style="flex:1;background:var(--green);border-radius:3px 0 0 0;height:${Math.max(monthlyOp[k]/maxOut*100,5)}%"></div><div style="flex:1;background:#C74545;border-radius:0 3px 0 0;height:${Math.max(monthlySusp[k]/maxOut*100,5)}%"></div></div><div class="month-bar-label">${k}</div></div>`).join('')}</div>`;
+
+    // Top diagnósticos
+    const dxCount={};
+    data.filter(r=>r.dx&&r.al!=='OPERADO').forEach(r=>{const dx=r.dx.substring(0,40);dxCount[dx]=(dxCount[dx]||0)+1;});
+    const topDx=Object.entries(dxCount).sort((a,b)=>b[1]-a[1]).slice(0,8);
+    const maxDx=topDx.length?topDx[0][1]:1;
+    document.getElementById('chart-dx').innerHTML=topDx.map(([dx,n])=>`<div class="bar-row"><div class="bar-label">${dx.substring(0,25)}</div><div class="bar-track"><div class="bar-fill blue" style="width:${n/maxDx*100}%">${n}</div></div></div>`).join('')||'<div class="gallery-empty">Sin datos</div>';
+
+    // Cirujanos (from operados comments or tabla data)
+    const cirCount={};
+    data.filter(r=>r.al==='OPERADO').forEach(r=>{
+      CIR_OPTIONS.forEach(c=>{if((r.com||'').includes(c.replace('Dr. ','').replace('Dra. ','')))cirCount[c]=(cirCount[c]||0)+1;});
+    });
+    // If no data from comments, show placeholder
+    const topCir=Object.entries(cirCount).sort((a,b)=>b[1]-a[1]);
+    const maxCir=topCir.length?topCir[0][1]:1;
+    document.getElementById('chart-cir').innerHTML=topCir.length?topCir.map(([c,n])=>`<div class="bar-row"><div class="bar-label">${c}</div><div class="bar-track"><div class="bar-fill green" style="width:${n/maxCir*100}%">${n}</div></div></div>`).join(''):'<div class="gallery-empty">Se llenará a medida que se registren operaciones</div>';
+
+    // Prioridad distribution
+    const prioCount={ALTA:0,MEDIA:0,BAJA:0};
+    data.filter(r=>r.al==='PROGRAMAR'||r.al==='EN TABLA').forEach(r=>{if(r.prio in prioCount)prioCount[r.prio]++;});
+    const totalPrio=prioCount.ALTA+prioCount.MEDIA+prioCount.BAJA||1;
+    document.getElementById('chart-prio').innerHTML=`
+      <div class="bar-row"><div class="bar-label">ALTA</div><div class="bar-track"><div class="bar-fill red" style="width:${prioCount.ALTA/totalPrio*100}%">${prioCount.ALTA}</div></div></div>
+      <div class="bar-row"><div class="bar-label">MEDIA</div><div class="bar-track"><div class="bar-fill amber" style="width:${prioCount.MEDIA/totalPrio*100}%">${prioCount.MEDIA}</div></div></div>
+      <div class="bar-row"><div class="bar-label">BAJA</div><div class="bar-track"><div class="bar-fill blue" style="width:${prioCount.BAJA/totalPrio*100}%">${prioCount.BAJA}</div></div></div>`;
+
+    // Wait time distribution
+    const waitBuckets={'0-7 días':0,'8-14 días':0,'15-30 días':0,'31-60 días':0,'>60 días':0};
+    diasArr.forEach(d=>{if(d<=7)waitBuckets['0-7 días']++;else if(d<=14)waitBuckets['8-14 días']++;else if(d<=30)waitBuckets['15-30 días']++;else if(d<=60)waitBuckets['31-60 días']++;else waitBuckets['>60 días']++;});
+    const maxWait=Math.max(...Object.values(waitBuckets),1);
+    const waitColors=['green','green','amber','red','red'];
+    document.getElementById('chart-wait').innerHTML=Object.entries(waitBuckets).map(([k,n],i)=>`<div class="bar-row"><div class="bar-label">${k}</div><div class="bar-track"><div class="bar-fill ${waitColors[i]}" style="width:${n/maxWait*100}%">${n}</div></div></div>`).join('');
+
+    setSB('sb-stats','ok',`Estadísticas calculadas — ${data.length} registros`);
+  }catch(e){setSB('sb-stats','err','Error: '+(e.message||e));}
+}
+
+function imgCountTotal(){let t=0;Object.values(imgCounts).forEach(v=>t+=v);return t;}
 
 // ==================== CONFIG ====================
 function saveConfig(){
