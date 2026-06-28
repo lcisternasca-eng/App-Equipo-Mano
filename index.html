@@ -272,7 +272,7 @@ tr:hover td{background:var(--bg)}
               <span class="cht">Pacientes — DIFERIDOS</span>
               <div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap">
                 <select id="fil-estado" onchange="renderLista()" style="font-size:12px;padding:5px 8px;border-radius:var(--r);border:0.5px solid var(--border-mid);background:var(--surface);color:var(--text)">
-                  <option value="PROGRAMAR">PROGRAMAR</option><option value="EN TABLA">EN TABLA</option><option value="OPERADO">OPERADO</option><option value="ACTIVOS">PROGRAMAR + EN TABLA</option>
+                  <option value="PROGRAMAR">PROGRAMAR</option><option value="EN TABLA">EN TABLA</option><option value="OPERADO">OPERADO</option><option value="ACTIVOS">PROGRAMAR + EN TABLA</option><option value="DESCARTADOS">Descartados</option>
                 </select>
                 <select id="fil-prio" onchange="renderLista()" style="font-size:12px;padding:5px 8px;border-radius:var(--r);border:0.5px solid var(--border-mid);background:var(--surface);color:var(--text)">
                   <option value="">Todas prioridades</option><option value="ALTA">ALTA</option><option value="MEDIA">MEDIA</option><option value="BAJA">BAJA</option>
@@ -480,6 +480,29 @@ tr:hover td{background:var(--bg)}
       </div>
     </div>
     <div class="mft"><button class="btn" onclick="closeM('modal-card')">Cancelar</button><button class="btn btn-p" onclick="guardarTarjeta()">Guardar</button></div>
+  </div>
+</div>
+
+<!-- MODAL: Descartar paciente -->
+<div class="mbg" id="modal-descartar">
+  <div class="modal" style="width:440px">
+    <div class="mhd"><h2>Descartar paciente</h2><button class="bti" onclick="closeM('modal-descartar')">✕</button></div>
+    <div class="mbd">
+      <div class="info-grid" id="desc-info"></div>
+      <div class="fg"><label>Motivo *</label>
+        <select id="desc-motivo">
+          <option value="NO QUIRURGICO">No quirúrgico</option>
+          <option value="RECHAZA">Paciente rechaza cirugía</option>
+          <option value="NO CONTESTA">No contesta / no localizable</option>
+          <option value="NSP CX">NSP CX</option>
+          <option value="CITAR POLI">Citar a policlínico</option>
+          <option value="DUPLICADO">Registro duplicado</option>
+          <option value="OTRO">Otro motivo</option>
+        </select>
+      </div>
+      <div class="fg"><label>Detalle (opcional)</label><textarea id="desc-det" placeholder="Observaciones..."></textarea></div>
+    </div>
+    <div class="mft"><button class="btn" onclick="closeM('modal-descartar')">Cancelar</button><button class="btn" style="background:var(--red-d);border-color:var(--red-d);color:#fff" onclick="confirmarDescarte()">Descartar</button></div>
   </div>
 </div>
 
@@ -787,6 +810,7 @@ function renderLista(){
   const searchQ=(document.getElementById('search-lista').value||'').toLowerCase().trim();
   let rows=diferidosData;
   if(fE==='ACTIVOS')rows=rows.filter(r=>r.al==='PROGRAMAR'||r.al==='EN TABLA');
+  else if(fE==='DESCARTADOS')rows=rows.filter(r=>!['PROGRAMAR','EN TABLA','OPERADO',''].includes(r.al));
   else if(fE)rows=rows.filter(r=>r.al===fE);
   if(fP)rows=rows.filter(r=>r.prio===fP);
   rows=filterSearch(rows,searchQ);
@@ -1135,7 +1159,7 @@ function waitCardHtml(p){
     <div class="kcard-name">${p.nombre}</div>
     <div class="kcard-dx">${p.dx}${lat}${dom}</div>
     <div class="kcard-meta"><span>${p.edad?p.edad+'a':''}</span>${p.rut?`<span>${p.rut}</span>`:''}</div>
-    <div class="kcard-bot">${diasTag(p.dias)}${p.tel?`<span style="font-size:10px;color:var(--text-3)">${p.tel}</span>`:''}</div>
+    <div class="kcard-bot">${diasTag(p.dias)}<span style="display:flex;gap:4px;align-items:center">${p.tel?`<span style="font-size:10px;color:var(--text-3)">${p.tel}</span>`:''}<span class="bti" onclick="event.stopPropagation();abrirDescarte('${p.rut}','${p.nombre.replace(/'/g,"\\'")}',null,null)" title="Descartar" style="font-size:11px;color:var(--text-3)">✕</span></span></div>
   </div>`;
 }
 
@@ -1154,7 +1178,7 @@ function kanbanCardHtml(slot,col,turnoNum){
     <div class="kcard-dx">${f.DG||''} ${f.LATERALIDAD?'· '+f.LATERALIDAD:''}</div>
     <div class="kcard-meta">${f.EDAD?`<span>${f.EDAD}a</span>`:''}${f.CX?`<span>${f.CX.substring(0,30)}</span>`:''}${f.ANESTESIA?`<span>${f.ANESTESIA.substring(0,15)}</span>`:''}</div>
     <div class="kcard-bot">
-      ${closed?'':`<button class="btn" style="padding:3px 9px;font-size:10px;border-color:var(--border-mid)" onclick="event.stopPropagation();abrirCerrar(this)">Cerrar</button>`}
+      ${closed?'':`<span style="display:flex;gap:4px"><button class="btn" style="padding:3px 9px;font-size:10px;border-color:var(--border-mid)" onclick="event.stopPropagation();abrirCerrar(this)">Cerrar</button><span class="bti" onclick="event.stopPropagation();abrirDescarte('${rut}','${(f.NOMBRE||'').replace(/'/g,"\\'")}','${col.colLetter}',${slot.rowStart})" title="Descartar" style="font-size:11px;color:var(--text-3)">✕</span></span>`}
       <span style="font-size:10px;color:var(--text-3)">${f.CIRUJANOS?f.CIRUJANOS.substring(0,18):''}</span>
     </div>
   </div>`;
@@ -1509,6 +1533,43 @@ function renderLog(){
   const log=ls.get('log')||[];const ll=document.getElementById('log-list');
   if(!log.length){ll.innerHTML='<div class="empty-s">Sin cambios aún.</div>';return;}
   ll.innerHTML=log.map(e=>{const d=new Date(e.ts);return `<div class="log-item"><div class="log-time">${d.toLocaleDateString('es-CL')} ${d.toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'})} · ${e.user}</div><div>${e.text}</div></div>`;}).join('');
+}
+
+// ==================== DESCARTAR ====================
+let descContext=null;
+function abrirDescarte(rut,nombre,colLetter,rowStart){
+  const dif=diferidosData.find(r=>r.rut&&r.rut.replace(/[.\-]/g,'')===rut.replace(/[.\-]/g,''));
+  descContext={rut,nombre,colLetter,rowStart:rowStart?parseInt(rowStart):null,dif};
+  document.getElementById('desc-info').innerHTML=`<div><strong>Paciente</strong>${nombre}</div><div><strong>RUT</strong>${rut}</div>`;
+  document.getElementById('desc-det').value='';
+  openM('modal-descartar');
+}
+
+async function confirmarDescarte(){
+  if(!descContext)return;
+  const motivo=document.getElementById('desc-motivo').value;
+  const det=document.getElementById('desc-det').value;
+  const nota=motivo+(det?' — '+det:'');
+  toast('Descartando...');
+  try{
+    // If card was in the tabla (kanban), clear those cells
+    if(descContext.colLetter&&descContext.rowStart){
+      const empty=[];for(let i=0;i<15;i++)empty.push(['']);
+      await sheetsUpdate(CFG.sheetT,`'${CFG.tabT}'!${descContext.colLetter}${descContext.rowStart}:${descContext.colLetter}${descContext.rowStart+14}`,empty);
+    }
+    // Update DIFERIDOS: change AL to the motivo, add note to comments
+    if(descContext.dif){
+      const newCom=(descContext.dif.com||'')+(descContext.dif.com?' | ':'')+nota+' ('+new Date().toLocaleDateString('es-CL')+')';
+      await sheetsBatch(CFG.sheetD,[
+        {range:`'${CFG.tabD}'!${DCOL.AL}${descContext.dif.ri}`,values:[[motivo]]},
+        {range:`'${CFG.tabD}'!${DCOL.COM}${descContext.dif.ri}`,values:[[newCom]]}
+      ]);
+    }
+    addLog(`✕ Descartado: ${descContext.nombre} — ${nota}`);
+    toast(`${descContext.nombre} descartado ✓`);
+    closeM('modal-descartar');descContext=null;
+    await loadDiferidos();await loadKanban();
+  }catch(e){toast('Error: '+(e.message||e));}
 }
 
 // ==================== STATISTICS ====================
