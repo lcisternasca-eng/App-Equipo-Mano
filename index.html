@@ -1052,7 +1052,7 @@ function kanbanCardHtml(slot,col,turnoNum){
   const prio=dif?dif.prio:'';
   const closed=isOp||isSusp;
   const rut=f.RUT||'';const ic=imgCountForRut(rut);
-  const rxHtml=ic?`<span class="rx-badge has" onclick="event.stopPropagation();openGallery('${rut}','${(f.NOMBRE||'').replace(/'/g,"\\'")}')">${ic} RX</span>`:'';
+  const rxHtml=`<span class="rx-badge ${ic?'has':''}" onclick="event.stopPropagation();openGallery('${rut}','${(f.NOMBRE||'').replace(/'/g,"\\'")}')">${ic?ic+' RX':'+ RX'}</span>`;
   return `<div class="kcard ${stateClass}" draggable="${!closed}" data-src="kanban" data-col="${col.colLetter}" data-col-idx="${col.colIdx}" data-row-start="${slot.rowStart}" data-rut="${rut}" data-nombre="${f.NOMBRE}" ondblclick="editarTarjeta(this)">
     <div class="kcard-top"><span class="kcard-turno">${turnoNum}°</span>${rxHtml}${prio?prioTag(prio):''}</div>
     <div class="kcard-name">${f.NOMBRE}</div>
